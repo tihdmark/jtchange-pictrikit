@@ -69,7 +69,11 @@ export default async function handler(req, res) {
       
     } catch (error) {
       console.error('Get feedback error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        debug: error.message,
+        stack: error.stack?.split('\n')[0]
+      });
     }
   }
   
@@ -129,7 +133,11 @@ export default async function handler(req, res) {
       
     } catch (error) {
       console.error('Submit feedback error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        debug: error.message,
+        stack: error.stack?.split('\n')[0]
+      });
     }
   }
   
@@ -178,7 +186,11 @@ export default async function handler(req, res) {
       
     } catch (error) {
       console.error('Reply error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        debug: error.message,
+        stack: error.stack?.split('\n')[0]
+      });
     }
   }
   
@@ -227,7 +239,11 @@ export default async function handler(req, res) {
       
     } catch (error) {
       console.error('Delete error:', error);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        debug: error.message,
+        stack: error.stack?.split('\n')[0]
+      });
     }
   }
   
