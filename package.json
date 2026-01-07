@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Free screenshot layout tool - Create beautiful image compositions",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'Static site - no build needed'",

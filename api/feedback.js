@@ -1,6 +1,8 @@
 // Vercel Serverless Function for feedback system
 // Supports: POST (submit), GET (list public), PUT (admin reply), DELETE (admin soft delete)
 
+import { kv } from '@vercel/kv';
+
 // Rate limiting: simple in-memory store (resets on cold start)
 const rateLimitMap = new Map();
 const RATE_LIMIT_WINDOW = 60000; // 1 minute
@@ -35,14 +37,6 @@ export default async function handler(req, res) {
   
   const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
   
-  // Debug info for environment variables
-  const envDebug = {
-    hasKvUrl: !!process.env.KV_REST_API_URL,
-    hasKvToken: !!process.env.KV_REST_API_TOKEN,
-    hasAdminToken: !!process.env.FEEDBACK_ADMIN_TOKEN,
-    nodeVersion: process.version
-  };
-  
   // GET - List public feedback
   if (req.method === 'GET') {
     try {
@@ -50,44 +44,41 @@ export default async function handler(req, res) {
       
       // Try Vercel KV
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-        const { kv } = await import('@vercel/kv');
-        const feedbackList = await kv.lrange('pictrikit:feedback', 0, 100);
-        const parsed = feedbackList.map(item => {
-          try { 
-            const f = typeof item === 'string' ? JSON.parse(item) : item;
-            // Skip deleted items for non-admin
-            if (f.deleted && !isAdmin) return null;
-            // Return only public fields for non-admin
-            return {
-              id: f.id,
-              content: f.content,
-              username: f.username,
-              timestamp: f.timestamp,
-              reply: f.reply || null,
-              deleted: isAdmin ? f.deleted : undefined
-            };
-          } catch { return null; }
-        }).filter(Boolean);
-        
-        return res.status(200).json({ success: true, feedback: parsed, isAdmin });
+        try {
+          const feedbackList = await kv.lrange('pictrikit:feedback', 0, 100);
+          const parsed = feedbackList.map(item => {
+            try { 
+              const f = typeof item === 'string' ? JSON.parse(item) : item;
+              // Skip deleted items for non-admin
+              if (f.deleted && !isAdmin) return null;
+              // Return only public fields for non-admin
+              return {
+                id: f.id,
+                content: f.content,
+                username: f.username,
+                timestamp: f.timestamp,
+                reply: f.reply || null,
+                deleted: isAdmin ? f.deleted : undefined
+              };
+            } catch { return null; }
+          }).filter(Boolean);
+          
+          return res.status(200).json({ success: true, feedback: parsed, isAdmin });
+        } catch (kvError) {
+          console.error('KV error:', kvError);
+          // Fallback to empty array if KV fails
+          return res.status(200).json({ success: true, feedback: [], isAdmin });
+        }
       }
       
-      // No KV configured
-      return res.status(200).json({ 
-        success: true, 
-        feedback: [], 
-        isAdmin,
-        debug: envDebug,
-        message: 'KV not configured, using fallback mode'
-      });
+      // No KV configured - return standard response
+      return res.status(200).json({ success: true, feedback: [], isAdmin });
       
     } catch (error) {
       console.error('Get feedback error:', error);
       return res.status(500).json({ 
         error: 'Internal server error',
-        debug: error.message,
-        stack: error.stack?.split('\n')[0],
-        envDebug: envDebug
+        message: error.message
       });
     }
   }
@@ -135,10 +126,10 @@ export default async function handler(req, res) {
       // Store in Vercel KV
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
         try {
-          const { kv } = await import('@vercel/kv');
           await kv.lpush('pictrikit:feedback', JSON.stringify(feedback));
         } catch (kvError) {
           console.error('KV storage failed:', kvError);
+          // Continue execution even if KV fails
         }
       }
       
@@ -150,8 +141,7 @@ export default async function handler(req, res) {
       console.error('Submit feedback error:', error);
       return res.status(500).json({ 
         error: 'Internal server error',
-        debug: error.message,
-        stack: error.stack?.split('\n')[0]
+        message: error.message
       });
     }
   }
@@ -173,28 +163,32 @@ export default async function handler(req, res) {
       }
       
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-        const { kv } = await import('@vercel/kv');
-        const feedbackList = await kv.lrange('pictrikit:feedback', 0, -1);
-        
-        let updated = false;
-        const newList = feedbackList.map(item => {
-          const f = typeof item === 'string' ? JSON.parse(item) : item;
-          if (f.id === feedbackId) {
-            f.reply = reply ? reply.trim().slice(0, 500) : null;
-            updated = true;
+        try {
+          const feedbackList = await kv.lrange('pictrikit:feedback', 0, -1);
+          
+          let updated = false;
+          const newList = feedbackList.map(item => {
+            const f = typeof item === 'string' ? JSON.parse(item) : item;
+            if (f.id === feedbackId) {
+              f.reply = reply ? reply.trim().slice(0, 500) : null;
+              updated = true;
+            }
+            return JSON.stringify(f);
+          });
+          
+          if (updated) {
+            await kv.del('pictrikit:feedback');
+            for (const item of newList.reverse()) {
+              await kv.lpush('pictrikit:feedback', item);
+            }
+            return res.status(200).json({ success: true });
           }
-          return JSON.stringify(f);
-        });
-        
-        if (updated) {
-          await kv.del('pictrikit:feedback');
-          for (const item of newList.reverse()) {
-            await kv.lpush('pictrikit:feedback', item);
-          }
-          return res.status(200).json({ success: true });
+          
+          return res.status(404).json({ error: 'Feedback not found' });
+        } catch (kvError) {
+          console.error('KV error:', kvError);
+          return res.status(500).json({ error: 'KV operation failed', message: kvError.message });
         }
-        
-        return res.status(404).json({ error: 'Feedback not found' });
       }
       
       return res.status(400).json({ error: 'KV not configured' });
@@ -203,8 +197,7 @@ export default async function handler(req, res) {
       console.error('Reply error:', error);
       return res.status(500).json({ 
         error: 'Internal server error',
-        debug: error.message,
-        stack: error.stack?.split('\n')[0]
+        message: error.message
       });
     }
   }
@@ -226,28 +219,32 @@ export default async function handler(req, res) {
       }
       
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-        const { kv } = await import('@vercel/kv');
-        const feedbackList = await kv.lrange('pictrikit:feedback', 0, -1);
-        
-        let updated = false;
-        const newList = feedbackList.map(item => {
-          const f = typeof item === 'string' ? JSON.parse(item) : item;
-          if (f.id === feedbackId) {
-            f.deleted = true;
-            updated = true;
+        try {
+          const feedbackList = await kv.lrange('pictrikit:feedback', 0, -1);
+          
+          let updated = false;
+          const newList = feedbackList.map(item => {
+            const f = typeof item === 'string' ? JSON.parse(item) : item;
+            if (f.id === feedbackId) {
+              f.deleted = true;
+              updated = true;
+            }
+            return JSON.stringify(f);
+          });
+          
+          if (updated) {
+            await kv.del('pictrikit:feedback');
+            for (const item of newList.reverse()) {
+              await kv.lpush('pictrikit:feedback', item);
+            }
+            return res.status(200).json({ success: true });
           }
-          return JSON.stringify(f);
-        });
-        
-        if (updated) {
-          await kv.del('pictrikit:feedback');
-          for (const item of newList.reverse()) {
-            await kv.lpush('pictrikit:feedback', item);
-          }
-          return res.status(200).json({ success: true });
+          
+          return res.status(404).json({ error: 'Feedback not found' });
+        } catch (kvError) {
+          console.error('KV error:', kvError);
+          return res.status(500).json({ error: 'KV operation failed', message: kvError.message });
         }
-        
-        return res.status(404).json({ error: 'Feedback not found' });
       }
       
       return res.status(400).json({ error: 'KV not configured' });
@@ -256,8 +253,7 @@ export default async function handler(req, res) {
       console.error('Delete error:', error);
       return res.status(500).json({ 
         error: 'Internal server error',
-        debug: error.message,
-        stack: error.stack?.split('\n')[0]
+        message: error.message
       });
     }
   }
