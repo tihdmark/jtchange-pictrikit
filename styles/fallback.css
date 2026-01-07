@@ -1,0 +1,313 @@
+/**
+ * Fallback CSS - 当 Tailwind CDN 无法加载时使用
+ */
+
+/* ========== 基础变量 ========== */
+:root {
+  --primary: #007AFF;
+  --background-light: #F2F2F7;
+  --surface-light: #FFFFFF;
+  --panel-light: #F9F9FB;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+}
+
+/* ========== 布局 ========== */
+body {
+  margin: 0;
+  background: var(--background-light);
+  color: var(--gray-900);
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--gray-200);
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(12px);
+  flex-shrink: 0;
+}
+
+header .flex { display: flex; align-items: center; }
+header .gap-1 { gap: 4px; }
+header .gap-2 { gap: 8px; }
+header .gap-3 { gap: 12px; }
+
+/* Logo */
+header .w-8 { width: 32px; height: 32px; border-radius: 8px; background: black; color: white; display: flex; align-items: center; justify-content: center; }
+header h1 { font-size: 13px; font-weight: 600; margin: 0; }
+
+/* Buttons */
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-family: inherit;
+}
+
+.h-7 { height: 28px; width: 28px; }
+.h-8 { height: 32px; padding: 0 16px; }
+.rounded-md { border-radius: 6px; }
+.rounded-full { border-radius: 9999px; }
+
+header button.rounded-md {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+}
+header button.rounded-md:hover { background: var(--gray-100); }
+
+header button.bg-gray-100 {
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+header button.bg-white {
+  background: white;
+  border: 1px solid var(--gray-200);
+  color: var(--gray-900);
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+header button.bg-slate-900 {
+  background: var(--gray-900);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Main Layout */
+.flex-1 { flex: 1; }
+.overflow-hidden { overflow: hidden; }
+
+body > div {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Sidebar */
+aside {
+  width: 300px;
+  background: var(--panel-light);
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+aside > div { padding: 20px; }
+aside h2 {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--gray-400);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 12px 4px;
+}
+
+/* Layout Cards Grid */
+.grid { display: grid; }
+.grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+.gap-3 { gap: 12px; }
+
+.layout-card {
+  aspect-ratio: 4/3;
+  border-radius: 16px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.layout-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  border-color: var(--gray-300);
+}
+.layout-card span:last-child {
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--gray-500);
+}
+
+/* Properties Panel */
+aside > div:last-child {
+  margin-top: auto;
+  border-top: 1px solid var(--gray-200);
+  background: rgba(255,255,255,0.8);
+}
+
+.space-y-4 > * + * { margin-top: 16px; }
+.space-y-8 > * + * { margin-top: 32px; }
+
+aside .flex.items-center.justify-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+aside input[type="range"] {
+  width: 80px;
+  height: 4px;
+  accent-color: black;
+}
+
+aside .text-\[11px\] { font-size: 11px; font-weight: 500; color: var(--gray-500); }
+aside .text-\[10px\] { font-size: 10px; font-family: monospace; color: var(--gray-400); }
+
+/* Toggle */
+aside button.w-9 {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: black;
+  position: relative;
+}
+aside button.w-9 span {
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.2s;
+}
+aside button.w-9 span.translate-x-4 { transform: translateX(16px); }
+
+/* Main Canvas Area - 浅灰色背景 */
+main {
+  flex: 1;
+  background: #c8c8c8;  /* 浅灰色背景 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 32px;
+  overflow: hidden;
+}
+
+/* Dot Pattern */
+main > div:first-child {
+  position: absolute;
+  inset: 0;
+  opacity: 0.08;
+  background-image: radial-gradient(rgba(255,255,255,0.8) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Canvas - 白色画板 */
+[data-canvas-root] {
+  position: relative;
+  width: 800px;
+  min-width: 600px;
+  min-height: 400px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+  display: inline-flex;
+  flex-direction: column;
+  z-index: 10;
+  border: none;
+}
+
+[data-canvas-content] {
+  flex: 1;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Zoom Controls */
+main > div:last-child {
+  position: absolute;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 9999px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 20;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+main > div:last-child button {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-500);
+}
+main > div:last-child button:hover {
+  background: white;
+  color: black;
+}
+
+main > div:last-child span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--gray-700);
+  width: 36px;
+  text-align: center;
+}
+
+/* Toast Container */
+#toast-container {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Utility Classes */
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.text-gray-400 { color: var(--gray-400); }
+.text-sm { font-size: 14px; }
+.mx-1, .mx-2 { margin: 0 4px; }
+.h-4.w-px { height: 16px; width: 1px; background: var(--gray-200); }
+.material-symbols-outlined { font-size: 18px; }

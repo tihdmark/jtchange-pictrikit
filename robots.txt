@@ -1,0 +1,17 @@
+# robots.txt for PictriKit
+# https://www.pictrikit.com
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://www.pictrikit.com/sitemap.xml
+
+# Disallow development/internal files
+Disallow: /dist/
+Disallow: /src/
+Disallow: /styles/
+Disallow: /.kiro/
+Disallow: /code.html
+Disallow: /node_modules/
+Disallow: /api/

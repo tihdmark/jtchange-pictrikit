@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>PictriKit - Screenshot Layout Tool</title>
+  <meta name="description" content="PictriKit - Free online screenshot layout tool. Create beautiful image compositions with multiple layouts including linear, focus, grid, compare and device frames.">
+  <meta name="keywords" content="screenshot, layout, image editor, photo collage, pictrikit, screen capture, image composition">
+  <link rel="canonical" href="https://www.pictrikit.com/app.html">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="PictriKit - Screenshot Layout Tool">
+  <meta property="og:description" content="Free online screenshot layout tool. Create beautiful image compositions.">
+  <meta property="og:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
+  <meta property="og:url" content="https://www.pictrikit.com/app.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PictriKit">
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="PictriKit - Screenshot Layout Tool">
+  <meta name="twitter:description" content="Free online screenshot layout tool. Create beautiful image compositions.">
+  <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
+  
+  <!-- Favicon -->
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="/assets/images/icon-180.svg">
+  
+  <!-- PWA -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#007AFF">
+  
+  <!-- Preconnect for faster font loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- Version: 2026-01-06-17:30 - Canvas API export for original resolution -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link href="./styles/canvas.css?v=20260106173000" rel="stylesheet"/>
+  <link rel="stylesheet" href="./styles/fallback.css?v=20260106173000"/>
+  <style>
+    * { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; }
+    body { -webkit-font-smoothing: antialiased; background: var(--bg-canvas); }
+    
+    /* CSS Variables for theming */
+    :root {
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-toolbar: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      --bg-panel: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+      --bg-canvas: #e2e8f0;
+      --bg-canvas-board: #ffffff;
+      --bg-card: #ffffff;
+      --border-color: #e2e8f0;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --text-muted: #94a3b8;
+      --text-toolbar: #1e293b;
+      --accent: #3b82f6;
+      --accent-light: rgba(59, 130, 246, 0.1);
+      --accent-hover: #2563eb;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+    
+    html.dark {
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #1a1a1a;
+      --bg-toolbar: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+      --bg-panel: linear-gradient(180deg, #1a1a1a 0%, #141414 100%);
+      --bg-canvas: #2a2a2a;
+      --bg-canvas-board: #1e1e1e;
+      --bg-card: #3a3a3a;
+      --border-color: #3d3d3d;
+      --text-primary: #f5f5f5;
+      --text-secondary: #a0a0a0;
+      --text-muted: #6b6b6b;
+      --text-toolbar: #f5f5f5;
+      --accent: #60a5fa;
+      --accent-light: rgba(96, 165, 250, 0.15);
+      --accent-hover: #3b82f6;
+    }
+    
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+    
+    /* Dark mode: panel background dark, layout cards lighter */
+    html.dark #panel { background: #1a1a1a !important; }
+    html.dark #panel-content { background: #1a1a1a !important; }
+    html.dark .layout-card { background: #e0e0e0 !important; border-color: #cccccc !important; }
+    html.dark .layout-card span { color: #1a1a1a !important; }
+    
+    /* Focus layout placeholder blocks - light gray */
+    .layout-card div div[style*="background:#5d5d5d"] { background: #b0b0b0 !important; }
+    
+    /* Right export panel styles */
+    #export-panel button:hover {
+      opacity: 0.85;
+    }
+    #export-panel .export-card {
+      transition: box-shadow 0.2s ease;
+    }
+    #export-panel .ratio-btn:hover {
+      background: var(--accent-light) !important;
+      border-color: var(--accent) !important;
+    }
+    #export-panel .ratio-btn:active {
+      transform: scale(0.98);
+    }
+    
+    .tool-btn { 
+      transition: all 0.2s ease;
+      position: relative;
+      color: var(--text-secondary);
+      background: transparent;
+    }
+    .tool-btn:hover { 
+      background: var(--accent-light);
+      color: var(--accent);
+      transform: translateY(-2px);
+    }
+    .tool-btn.active { 
+      background: var(--accent-light);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    .tool-btn.locked { 
+      background: var(--accent-light);
+      color: var(--accent);
+      box-shadow: inset 0 0 0 2px var(--accent);
+    }
+    .tool-btn .material-symbols-outlined {
+      transition: all 0.2s ease;
+    }
+    .tool-btn:hover .material-symbols-outlined {
+      transform: scale(1.1);
+    }
+    .layout-card { 
+      transition: all 0.2s ease;
+      background: var(--bg-primary);
+      border-color: var(--border-color);
+    }
+    .layout-card:hover { 
+      background: var(--accent-light); 
+      border-color: var(--accent); 
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+      transform: translateY(-2px);
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: var(--bg-secondary);
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: all 0.2s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+    
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      /* Hide desktop toolbar on mobile - keep in DOM for event handling */
+      nav#toolbar { 
+        position: absolute !important;
+        left: -9999px !important;
+        top: 0 !important;
+        opacity: 0 !important;
+        pointer-events: auto !important;
+        z-index: -1 !important;
+      }
+      
+      /* Hide right export panel on mobile */
+      #export-panel { display: none !important; }
+      
+      /* Hide desktop footer on mobile */
+      footer { display: none !important; }
+      
+      /* Hide old mobile toolbar */
+      nav#mobile-toolbar,
+      .mobile-toolbar { 
+        display: none !important; 
+      }
+      
+      /* Mobile header with hamburger menu */
+      .mobile-menu-btn {
+        display: flex !important;
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        align-items: center;
+        justify-content: center;
+        color: #1d1d1f;
+      }
+      
+      .mobile-menu-btn:active {
+        background: rgba(0,0,0,0.05);
+      }
+      
+      /* Mobile menu overlay */
+      .mobile-menu-overlay {
+        display: block !important;
+        position: fixed;
+        inset: 0;
+        z-index: 300;
+        visibility: hidden;
+        opacity: 0;
+        transition: visibility 0.25s, opacity 0.25s;
+      }
+      
+      .mobile-menu-overlay.active {
+        visibility: visible;
+        opacity: 1;
+      }
+      
+      .mobile-menu-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(0,0,0,0.3);
+      }
+      
+      .mobile-menu-content {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 280px;
+        max-width: 80vw;
+        height: 100%;
+        background: #f5f5f7;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+      }
+      
+      .mobile-menu-overlay.active .mobile-menu-content {
+        transform: translateX(0);
+      }
+      
+      .mobile-menu-header {
+        padding: 16px;
+        border-bottom: 1px solid #d1d1d6;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      
+      .mobile-menu-close {
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #86868b;
+      }
+      
+      .mobile-menu-section {
+        padding: 12px 16px;
+      }
+      
+      .mobile-menu-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: #86868b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+      }
+      
+      .mobile-menu-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 10px;
+        background: white;
+        border: 1px solid #e5e5ea;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      
+      .mobile-menu-item:active {
+        background: #f0f0f5;
+      }
+      
+      .mobile-menu-item .material-symbols-outlined {
+        font-size: 22px;
+        color: #636366;
+      }
+      
+      .mobile-menu-item span:last-child {
+        font-size: 15px;
+        font-weight: 500;
+        color: #1d1d1f;
+      }
+      
+      /* Adjust main canvas area for mobile */
+      main#canvas-area {
+        padding: 16px !important;
+        padding-bottom: 24px !important;
+      }
+      
+      /* Mobile panel as bottom sheet */
+      aside#panel {
+        position: fixed !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        top: auto !important;
+        width: 100% !important;
+        max-height: 55vh !important;
+        border-radius: 20px 20px 0 0 !important;
+        border-right: none !important;
+        border-top: none !important;
+        box-shadow: 0 -8px 30px rgba(0,0,0,0.12) !important;
+        z-index: 250 !important;
+        background: #ffffff !important;
+        transform: translateY(100%) !important;
+        transition: transform 0.3s ease !important;
+      }
+      
+      aside#panel.panel-open {
+        transform: translateY(0) !important;
+      }
+      
+      aside#panel #panel-header {
+        border-radius: 20px 20px 0 0;
+        background: #ffffff;
+      }
+      
+      aside#panel #panel-header::before {
+        content: '';
+        position: absolute;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 36px;
+        height: 4px;
+        background: #d1d1d6;
+        border-radius: 2px;
+      }
+      
+      /* Header adjustments for mobile */
+      header {
+        padding: 0 12px !important;
+        height: 52px !important;
+      }
+      
+      header .desktop-only {
+        display: none !important;
+      }
+      
+      /* Show mobile undo/redo in header */
+      header .mobile-header-actions {
+        display: flex !important;
+        gap: 2px;
+      }
+      
+      header button span:not(.material-symbols-outlined) {
+        display: none !important;
+      }
+      
+      header button[data-action="copy"],
+      header button[data-action="export"] {
+        padding: 0 12px !important;
+        height: 34px !important;
+      }
+      
+      /* Mobile floating controls */
+      .mobile-float-controls {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 24px !important;
+        right: 16px !important;
+        background: rgba(255,255,255,0.95) !important;
+        backdrop-filter: blur(20px) !important;
+        border-radius: 12px !important;
+        padding: 6px !important;
+        gap: 4px !important;
+        box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+        border: 1px solid rgba(0,0,0,0.06) !important;
+        z-index: 100 !important;
+      }
+      
+      .mobile-float-controls button {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: transparent;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #636366;
+      }
+      
+      .mobile-float-controls button:active {
+        background: rgba(0,0,0,0.05);
+      }
+      
+      .mobile-float-controls .divider {
+        width: 1px;
+        height: 24px;
+        background: #e5e5ea;
+        margin: 6px 2px;
+      }
+      
+      /* Hide desktop zoom controls on mobile */
+      .desktop-zoom-controls {
+        display: none !important;
+      }
+      
+      /* Mobile empty state */
+      .mobile-empty-state {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        gap: 20px;
+      }
+      
+      .mobile-empty-hint {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        margin-top: 16px;
+      }
+      
+      .mobile-layout-preview {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        opacity: 0.4;
+      }
+      
+      .mobile-layout-preview-item {
+        width: 56px;
+        height: 40px;
+        border-radius: 6px;
+        border: 1.5px dashed #c7c7cc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      /* Color picker panel for mobile */
+      #color-picker-panel {
+        bottom: 100px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        max-width: calc(100vw - 32px);
+      }
+      
+      /* Toast container for mobile */
+      #toast-container {
+        bottom: 90px !important;
+        right: 16px !important;
+      }
+      
+      /* Canvas adjustments for mobile */
+      #canvas-root {
+        width: calc(100vw - 32px) !important;
+        min-width: auto !important;
+        height: auto !important;
+        min-height: 280px !important;
+        aspect-ratio: 16/10;
+      }
+    }
+    
+    /* Desktop styles */
+    @media (min-width: 769px) {
+      .mobile-menu-btn { display: none !important; }
+      .mobile-menu-overlay { display: none !important; }
+      .mobile-float-controls { display: none !important; }
+      .mobile-empty-hint { display: none !important; }
+      .mobile-layout-preview { display: none !important; }
+      nav#mobile-toolbar,
+      .mobile-toolbar { display: none !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;background:#F2F2F7;overflow:hidden;height:100vh;display:flex;flex-direction:column;">
+
+<!-- Header -->
+<header style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-bottom:1px solid var(--border-color);background:var(--bg-primary);backdrop-filter:blur(20px);flex-shrink:0;z-index:100;">
+  <div style="display:flex;align-items:center;gap:8px;">
+    <!-- Mobile Menu Button -->
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu" onclick="console.log('inline click'); document.getElementById('mobile-menu-overlay').classList.add('active'); document.body.style.overflow='hidden';">
+      <span class="material-symbols-outlined" style="font-size:24px;">menu</span>
+    </button>
+    <a href="/" style="display:flex;align-items:center;gap:8px;text-decoration:none;">
+      <div style="width:28px;height:28px;border-radius:6px;background:#007AFF;color:#fff;display:flex;align-items:center;justify-content:center;">
+        <span class="material-symbols-outlined" style="font-size:16px;">crop_free</span>
+      </div>
+      <span style="font-size:14px;font-weight:600;color:#1d1d1f;">PictriKit</span>
+    </a>
+    <div class="desktop-only" style="height:16px;width:1px;background:#d1d1d6;margin:0 8px;"></div>
+    <div class="desktop-only" style="display:flex;gap:2px;">
+      <button data-action="undo" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;" title="Undo">
+        <span class="material-symbols-outlined" style="font-size:18px;">undo</span>
+      </button>
+      <button data-action="redo" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;" title="Redo">
+        <span class="material-symbols-outlined" style="font-size:18px;">redo</span>
+      </button>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <!-- Mobile Undo/Redo buttons -->
+    <div class="mobile-header-actions" style="display:none;">
+      <button data-action="undo" style="width:32px;height:32px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;" title="Undo">
+        <span class="material-symbols-outlined" style="font-size:20px;">undo</span>
+      </button>
+      <button data-action="redo" style="width:32px;height:32px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;" title="Redo">
+        <span class="material-symbols-outlined" style="font-size:20px;">redo</span>
+      </button>
+    </div>
+    <!-- Theme Toggle - moved left -->
+    <button id="theme-toggle" style="width:32px;height:32px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);" title="Toggle dark mode">
+      <span class="material-symbols-outlined" style="font-size:20px;">dark_mode</span>
+    </button>
+    <!-- Feedback Button - text style like Copy -->
+    <a href="/feedback.html" id="feedback-btn" style="height:32px;padding:0 12px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-primary);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:none;" title="Send feedback">
+      <span class="material-symbols-outlined" style="font-size:15px;">feedback</span>
+      <span>Feedback</span>
+    </a>
+    <!-- Divider -->
+    <div style="height:20px;width:1px;background:var(--border-color);margin:0 4px;"></div>
+    <button data-action="copy" style="height:32px;padding:0 14px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-primary);cursor:pointer;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:var(--text-primary);">
+      <span class="material-symbols-outlined" style="font-size:15px;">content_copy</span>
+      <span>Copy</span>
+    </button>
+    <button data-action="export" style="height:32px;padding:0 14px;border-radius:6px;border:none;background:#3b82f6;color:#fff;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;">
+      <span class="material-symbols-outlined" style="font-size:15px;">download</span>
+      <span>Export</span>
+    </button>
+  </div>
+</header>
+
+<!-- Mobile Menu Overlay -->
+<div class="mobile-menu-overlay" id="mobile-menu-overlay">
+  <div class="mobile-menu-backdrop" id="mobile-menu-backdrop" onclick="document.getElementById('mobile-menu-overlay').classList.remove('active'); document.body.style.overflow='';"></div>
+  <div class="mobile-menu-content">
+    <div class="mobile-menu-header">
+      <span style="font-size:15px;font-weight:600;color:#1d1d1f;">Layouts</span>
+      <button class="mobile-menu-close" id="mobile-menu-close" onclick="document.getElementById('mobile-menu-overlay').classList.remove('active'); document.body.style.overflow='';">
+        <span class="material-symbols-outlined" style="font-size:20px;">close</span>
+      </button>
+    </div>
+    
+    <div style="flex:1;overflow-y:auto;">
+      <div class="mobile-menu-section">
+        <div class="mobile-menu-section-title">Choose Layout</div>
+        <div class="mobile-menu-item" data-tool="linear">
+          <span class="material-symbols-outlined">view_column</span>
+          <span>Linear</span>
+        </div>
+        <div class="mobile-menu-item" data-tool="focus">
+          <span class="material-symbols-outlined">center_focus_strong</span>
+          <span>Focus</span>
+        </div>
+        <div class="mobile-menu-item" data-tool="grid">
+          <span class="material-symbols-outlined">grid_view</span>
+          <span>Grid</span>
+        </div>
+        <div class="mobile-menu-item" data-tool="compare">
+          <span class="material-symbols-outlined">compare</span>
+          <span>Compare</span>
+        </div>
+        <div class="mobile-menu-item" data-tool="frames">
+          <span class="material-symbols-outlined">devices</span>
+          <span>Frames</span>
+        </div>
+      </div>
+      
+      <div class="mobile-menu-section" style="border-top:1px solid #e5e5ea;padding-top:16px;">
+        <div class="mobile-menu-section-title">Adjust</div>
+        <div class="mobile-menu-item" data-tool="properties">
+          <span class="material-symbols-outlined">tune</span>
+          <span>Style Settings</span>
+        </div>
+      </div>
+    </div>
+    
+    <div style="padding:16px;border-top:1px solid #e5e5ea;">
+      <a href="/" style="display:flex;align-items:center;justify-content:center;gap:6px;color:#86868b;text-decoration:none;font-size:13px;">
+        <span class="material-symbols-outlined" style="font-size:16px;">home</span>
+        Back to Home
+      </a>
+    </div>
+  </div>
+</div>
+
+<div style="display:flex;flex:1;overflow:hidden;position:relative;">
+  <!-- Toolbar -->
+  <nav id="toolbar" style="width:80px;background:var(--bg-toolbar);border-right:1px solid #2d2d2d;display:flex;flex-direction:column;align-items:center;padding:16px 0;flex-shrink:0;z-index:60;gap:8px;">
+    <button class="tool-btn" data-tool="linear" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#3b82f6;">view_column</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Linear</span>
+    </button>
+    <button class="tool-btn" data-tool="focus" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#8b5cf6;">center_focus_strong</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Focus</span>
+    </button>
+    <button class="tool-btn" data-tool="grid" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#10b981;">grid_view</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Grid</span>
+    </button>
+    <button class="tool-btn" data-tool="compare" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#f59e0b;">compare</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Compare</span>
+    </button>
+    <button class="tool-btn" data-tool="frames" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#ec4899;">devices</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Frames</span>
+    </button>
+    <button class="tool-btn" data-tool="properties" style="width:64px;height:64px;border:none;background:transparent;border-radius:14px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;">
+      <span class="material-symbols-outlined" style="font-size:28px;color:#6366f1;">tune</span>
+      <span style="font-size:11px;font-weight:600;color:var(--text-toolbar);">Style</span>
+    </button>
+  </nav>
+
+  <!-- Floating Panel -->
+  <aside id="panel" style="position:absolute;left:80px;top:0;bottom:0;width:0;background:var(--bg-panel);border-right:1px solid var(--border-color);display:flex;flex-direction:column;overflow:hidden;transition:width 0.18s ease;z-index:55;">
+    <div id="panel-header" style="height:44px;padding:0 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-color);flex-shrink:0;">
+      <span id="panel-title" style="font-size:13px;font-weight:600;color:var(--text-primary);">Linear</span>
+      <button id="panel-close" style="width:24px;height:24px;border:none;background:transparent;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b6b6b;">
+        <span class="material-symbols-outlined" style="font-size:16px;">close</span>
+      </button>
+    </div>
+    <div id="panel-content" style="flex:1;overflow-y:auto;padding:12px;">
+      
+<!-- Linear Panel -->
+      <div class="panel-section" data-panel="linear" style="display:none;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button data-layout-type="horizontal-stack" class="layout-card" style="border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;">
+            <div style="display:flex;gap:6px;width:100%;height:48px;align-items:stretch;">
+              <div style="flex:1;background:linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);border-radius:6px;"></div>
+              <div style="flex:1;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:6px;"></div>
+              <div style="width:32px;border:2px dashed #b0b0b0;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#888888;font-size:16px;">+</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Horizontal Stack</span>
+          </button>
+          <button data-layout-type="vertical-stack" class="layout-card" style="border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;">
+            <div style="display:flex;flex-direction:column;gap:4px;width:55%;height:60px;">
+              <div style="flex:1;background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:6px;"></div>
+              <div style="flex:1;background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);border-radius:6px;"></div>
+              <div style="height:18px;border:2px dashed #b0b0b0;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#888888;font-size:14px;">+</div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Vertical Stack</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Focus Panel -->
+      <div class="panel-section" data-panel="focus" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button data-layout-type="left-focus" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:90%;height:50%;"><div style="flex:1;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Left Focus</span>
+          </button>
+          <button data-layout-type="right-focus" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:90%;height:50%;"><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div><div style="flex:1;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Right Focus</span>
+          </button>
+          <button data-layout-type="top-focus" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;flex-direction:column;gap:3px;width:90%;height:50%;"><div style="flex:2;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div><div style="flex:1;display:flex;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Top Focus</span>
+          </button>
+          <button data-layout-type="bottom-focus" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;flex-direction:column;gap:3px;width:90%;height:50%;"><div style="flex:1;display:flex;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div><div style="flex:2;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Bottom Focus</span>
+          </button>
+          <button data-layout-type="left-focus-4" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:90%;height:50%;"><div style="flex:1;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Left 4-Grid</span>
+          </button>
+          <button data-layout-type="right-focus-4" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:90%;height:50%;"><div style="flex:1;display:flex;flex-direction:column;gap:3px;"><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div><div style="flex:1;background:#b0b0b0;border-radius:4px;"></div></div><div style="flex:1;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Right 4-Grid</span>
+          </button>
+          <button data-layout-type="center-focus-5" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:2px;width:90%;height:50%;"><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div></div><div style="flex:1.2;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div><div style="flex:1;display:flex;flex-direction:column;gap:2px;"><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Center 5-Grid</span>
+          </button>
+          <button data-layout-type="top-focus-5" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;flex-direction:column;gap:2px;width:90%;height:50%;"><div style="flex:2;background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div><div style="flex:1;display:flex;gap:2px;"><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div><div style="flex:1;background:#b0b0b0;border-radius:3px;"></div></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Top 5-Grid</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Grid Panel -->
+      <div class="panel-section" data-panel="grid" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button data-layout-type="grid-2x2" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:75%;height:50%;"><div style="background:linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);border-radius:4px;"></div><div style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:4px;"></div><div style="background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);border-radius:4px;"></div><div style="background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:4px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">2×2 Grid</span>
+          </button>
+          <button data-layout-type="grid-1x3" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;width:90%;height:35%;"><div style="background:linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);border-radius:4px;"></div><div style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:4px;"></div><div style="background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);border-radius:4px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">1×3 Grid</span>
+          </button>
+          <button data-layout-type="grid-2x3" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;grid-template-rows:1fr 1fr;gap:3px;width:90%;height:50%;"><div style="background:linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #ec4899 0%, #f472b6 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);border-radius:3px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">2×3 Grid</span>
+          </button>
+          <button data-layout-type="grid-3x3" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:2px;width:75%;height:50%;"><div style="background:linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #10b981 0%, #34d399 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #ec4899 0%, #f472b6 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #ef4444 0%, #f87171 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #6366f1 0%, #818cf8 100%);border-radius:3px;"></div><div style="background:linear-gradient(135deg, #84cc16 0%, #a3e635 100%);border-radius:3px;"></div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">3×3 Grid</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Compare Panel -->
+      <div class="panel-section" data-panel="compare" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <button data-layout-type="before-after" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:90%;height:45%;"><div style="flex:1;background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">Before</div><div style="flex:1;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">After</div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Before / After</span>
+          </button>
+          <button data-layout-type="before-after-v" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-card);border:1px solid #3d3d3d;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;flex-direction:column;gap:3px;width:50%;height:50%;"><div style="flex:1;background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">Before</div><div style="flex:1;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:#fff;">After</div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Vertical</span>
+          </button>
+          <button data-layout-type="triple-compare" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-primary);border:1px solid var(--border-color);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:flex;gap:3px;width:95%;height:40%;"><div style="flex:1;background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">1</div><div style="flex:1;background:linear-gradient(135deg, #f97316 0%, #ea580c 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">2</div><div style="flex:1;background:linear-gradient(135deg, #10b981 0%, #059669 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">3</div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Triple</span>
+          </button>
+          <button data-layout-type="quad-compare" class="layout-card" style="aspect-ratio:4/3;border-radius:10px;background:var(--bg-primary);border:1px solid var(--border-color);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:12px;">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;width:75%;height:50%;"><div style="background:linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">1</div><div style="background:linear-gradient(135deg, #f97316 0%, #ea580c 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">2</div><div style="background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">3</div><div style="background:linear-gradient(135deg, #10b981 0%, #059669 100%);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:#fff;">4</div></div>
+            <span style="font-size:11px;font-weight:600;color:var(--text-primary);">Quad</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Frames Panel -->
+      <div class="panel-section" data-panel="frames" style="display:none;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button data-layout-type="browser" class="layout-card" style="border-radius:10px;background:var(--bg-primary);border:1px solid var(--border-color);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;">
+            <div style="width:100%;height:56px;border-radius:6px;background:var(--bg-primary);border:1px solid var(--border-color);overflow:hidden;display:flex;flex-direction:column;"><div style="height:16px;background:var(--bg-secondary);display:flex;align-items:center;padding:0 8px;gap:4px;border-bottom:1px solid var(--border-color);"><div style="width:8px;height:8px;border-radius:50%;background:#ff5f57;"></div><div style="width:8px;height:8px;border-radius:50%;background:#febc2e;"></div><div style="width:8px;height:8px;border-radius:50%;background:#28c840;"></div></div><div style="flex:1;background:var(--bg-secondary);"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Browser Frame</span>
+          </button>
+          <button data-layout-type="phone" class="layout-card" style="border-radius:10px;background:var(--bg-primary);border:1px solid var(--border-color);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;">
+            <div style="width:48px;height:84px;border-radius:12px;background:#1d1d1f;padding:5px;display:flex;flex-direction:column;"><div style="height:10px;display:flex;justify-content:center;align-items:center;"><div style="width:20px;height:4px;background:#3a3a3c;border-radius:2px;"></div></div><div style="flex:1;background:#f5f5f7;border-radius:8px;"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Phone Frame</span>
+          </button>
+          <button data-layout-type="tablet" class="layout-card" style="border-radius:10px;background:var(--bg-primary);border:1px solid var(--border-color);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;">
+            <div style="width:84px;height:60px;border-radius:8px;background:#1d1d1f;padding:4px;display:flex;flex-direction:column;"><div style="flex:1;background:#f5f5f7;border-radius:5px;"></div></div>
+            <span style="font-size:12px;font-weight:600;color:var(--text-primary);">Tablet Frame</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Properties Panel -->
+      <div class="panel-section" data-panel="properties" style="display:none;">
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px;">Padding</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input data-property="padding" type="range" min="0" max="60" value="24" style="flex:1;accent-color:#3b82f6;height:4px;"/>
+              <span data-display="padding" style="font-size:12px;font-weight:500;color:var(--text-secondary);width:28px;text-align:right;">24</span>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px;">Gap</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input data-property="gap" type="range" min="0" max="32" value="12" style="flex:1;accent-color:#3b82f6;height:4px;"/>
+              <span data-display="gap" style="font-size:12px;font-weight:500;color:var(--text-secondary);width:28px;text-align:right;">12</span>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:12px;font-weight:600;color:var(--text-primary);display:block;margin-bottom:8px;">Roundness</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <input data-property="roundness" type="range" min="0" max="24" value="12" style="flex:1;accent-color:#3b82f6;height:4px;"/>
+              <span data-display="roundness" style="font-size:12px;font-weight:500;color:var(--text-secondary);width:28px;text-align:right;">12</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+
+  <!-- Main Canvas Area -->
+  <main id="canvas-area" style="flex:1;background:var(--bg-canvas);overflow:hidden;display:flex;align-items:center;justify-content:center;position:relative;padding:40px;padding-bottom:80px;">
+    <div style="position:absolute;inset:0;opacity:0.03;background-image:radial-gradient(rgba(0,0,0,0.5) 1px, transparent 1px);background-size:20px 20px;pointer-events:none;"></div>
+    <div id="canvas-wrapper" style="display:flex;align-items:center;justify-content:center;min-width:100%;min-height:100%;">
+      <div data-canvas-root id="canvas-root" style="background:var(--bg-canvas-board);border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.08);width:900px;height:560px;min-width:600px;min-height:400px;display:flex;flex-direction:column;transition:transform 0.05s ease-out, background 0.3s ease;transform-origin:center center;">
+        <div data-canvas-content id="canvas-content" style="padding:24px;display:flex;flex-direction:column;flex:1;box-sizing:border-box;overflow:hidden;align-items:center;justify-content:center;">
+          <!-- Empty State -->
+          <div id="empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;">
+            <!-- Layout Preview Hint (visible on mobile) -->
+            <div class="mobile-layout-preview" style="display:none;margin-bottom:20px;">
+              <div class="mobile-layout-preview-item">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#c7c7cc;">view_column</span>
+              </div>
+              <div class="mobile-layout-preview-item">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#c7c7cc;">grid_view</span>
+              </div>
+              <div class="mobile-layout-preview-item">
+                <span class="material-symbols-outlined" style="font-size:18px;color:#c7c7cc;">compare</span>
+              </div>
+            </div>
+            <div style="color:#86868b;font-size:28px;font-weight:600;margin-bottom:8px;">
+              <span>Select a layout to start</span>
+            </div>
+            <!-- Mobile hint -->
+            <div class="mobile-empty-hint" style="display:none;">
+              <span style="color:#aeaeb2;font-size:14px;">Tap <span class="material-symbols-outlined" style="font-size:16px;vertical-align:middle;">menu</span> to choose</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Desktop Zoom Controls -->
+    <div class="desktop-zoom-controls" style="position:absolute;bottom:120px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.9);backdrop-filter:blur(20px);border:1px solid #d1d1d6;border-radius:8px;padding:4px 10px;display:flex;align-items:center;gap:6px;z-index:100;">
+      <button data-action="zoom-out" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;">
+        <span class="material-symbols-outlined" style="font-size:18px;">remove</span>
+      </button>
+      <span data-display="zoom" style="font-size:12px;font-weight:500;color:#1d1d1f;min-width:44px;text-align:center;">100%</span>
+      <button data-action="zoom-in" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;">
+        <span class="material-symbols-outlined" style="font-size:18px;">add</span>
+      </button>
+      <div style="width:1px;height:16px;background:#d1d1d6;margin:0 2px;"></div>
+      <button data-action="fit" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#86868b;" title="Fit to screen">
+        <span class="material-symbols-outlined" style="font-size:18px;">fit_screen</span>
+      </button>
+      <div style="width:1px;height:16px;background:#d1d1d6;margin:0 2px;"></div>
+      <!-- Background Color Picker -->
+      <div id="bg-color-btn" style="width:28px;height:28px;border:none;background:none;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;" title="Background Color">
+        <div id="bg-color-preview" style="width:18px;height:18px;border-radius:4px;background:linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);border:1px solid #d1d1d6;"></div>
+      </div>
+    </div>
+    
+    <!-- Mobile Floating Controls -->
+    <div class="mobile-float-controls" id="mobile-float-controls">
+      <button data-action="zoom-out" title="Zoom out" onclick="console.log('zoom out'); if(window.app) window.app.stateManager.setZoom(Math.max(0.5, window.app.stateManager.getState().zoom - 0.1));">
+        <span class="material-symbols-outlined" style="font-size:20px;">remove</span>
+      </button>
+      <button data-action="zoom-in" title="Zoom in" onclick="console.log('zoom in'); if(window.app) window.app.stateManager.setZoom(Math.min(2, window.app.stateManager.getState().zoom + 0.1));">
+        <span class="material-symbols-outlined" style="font-size:20px;">add</span>
+      </button>
+      <div class="divider"></div>
+      <button id="mobile-bg-color-btn" title="Background color">
+        <div id="mobile-bg-color-preview" style="width:20px;height:20px;border-radius:5px;background:linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);border:1px solid #d1d1d6;"></div>
+      </button>
+    </div>
+    
+    <!-- Color Picker Panel -->
+    <div id="color-picker-panel" style="display:none;position:fixed;bottom:180px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,0.98);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid #d1d1d6;border-radius:12px;padding:16px;z-index:10000;box-shadow:0 8px 32px rgba(0,0,0,0.2);min-width:200px;">
+      <div style="margin-bottom:12px;font-size:12px;font-weight:600;color:#1d1d1f;">Background Color</div>
+      <!-- Preset Colors -->
+      <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px;">
+        <div class="preset-color" data-color="#ffffff" style="width:24px;height:24px;border-radius:4px;background:#ffffff;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#f5f5f7" style="width:24px;height:24px;border-radius:4px;background:#f5f5f7;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#e5e5ea" style="width:24px;height:24px;border-radius:4px;background:#e5e5ea;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#1d1d1f" style="width:24px;height:24px;border-radius:4px;background:#1d1d1f;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#007AFF" style="width:24px;height:24px;border-radius:4px;background:#007AFF;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#34C759" style="width:24px;height:24px;border-radius:4px;background:#34C759;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#FF9500" style="width:24px;height:24px;border-radius:4px;background:#FF9500;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#FF3B30" style="width:24px;height:24px;border-radius:4px;background:#FF3B30;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#AF52DE" style="width:24px;height:24px;border-radius:4px;background:#AF52DE;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#5AC8FA" style="width:24px;height:24px;border-radius:4px;background:#5AC8FA;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="#FFCC00" style="width:24px;height:24px;border-radius:4px;background:#FFCC00;border:1px solid #d1d1d6;cursor:pointer;"></div>
+        <div class="preset-color" data-color="transparent" style="width:24px;height:24px;border-radius:4px;background:linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%),linear-gradient(45deg,#ccc 25%,transparent 25%,transparent 75%,#ccc 75%);background-size:8px 8px;background-position:0 0,4px 4px;border:1px solid #d1d1d6;cursor:pointer;" title="Transparent"></div>
+      </div>
+      <!-- Custom Color -->
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="color" id="bg-color-picker" value="#ffffff" style="width:32px;height:24px;border:none;border-radius:4px;cursor:pointer;"/>
+        <span style="font-size:11px;color:#8e8e93;">Custom</span>
+      </div>
+    </div>
+  </main>
+  
+  <!-- Right Export Panel - Apple-style design (Hidden for v1.0, will be enabled in next iteration) -->
+  <aside id="export-panel" style="display:none;width:240px;background:var(--bg-secondary);border-left:1px solid var(--border-color);flex-direction:column;flex-shrink:0;z-index:50;">
+    <!-- Panel Header -->
+    <div style="padding:16px 16px 12px;border-bottom:1px solid var(--border-color);">
+      <div style="font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">Export Enhancement</div>
+    </div>
+    
+    <!-- Content Area -->
+    <div style="padding:16px;display:flex;flex-direction:column;gap:16px;flex:1;overflow-y:auto;">
+      
+      <!-- Export Quality Card -->
+      <div class="export-card" style="background:var(--bg-primary);border-radius:10px;border:1px solid var(--border-color);overflow:hidden;">
+        <div style="padding:14px 14px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#8e8e93;">high_quality</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Export Quality</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.4;margin:0 0 12px;">Enhance clarity after export without affecting layout or dimensions.</p>
+          <button id="export-hd" style="width:100%;padding:8px 12px;border-radius:6px;border:none;background:#007AFF;color:#fff;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity 0.15s;">
+            <span class="material-symbols-outlined" style="font-size:14px;">download</span>
+            Export HD
+          </button>
+        </div>
+      </div>
+      
+      <!-- Platform Export Card -->
+      <div class="export-card" style="background:var(--bg-primary);border-radius:10px;border:1px solid var(--border-color);overflow:hidden;">
+        <div style="padding:14px 14px 12px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="material-symbols-outlined" style="font-size:18px;color:#8e8e93;">aspect_ratio</span>
+            <span style="font-size:13px;font-weight:600;color:var(--text-primary);">Platform Export</span>
+          </div>
+          <p style="font-size:11px;color:var(--text-muted);line-height:1.4;margin:0 0 12px;">Extend canvas to fit platform ratios. Content is never cropped.</p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <button class="ratio-btn" data-ratio="1:1" style="padding:8px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-secondary);font-size:11px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:all 0.15s;">
+              <div style="font-weight:600;">1:1</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Square</div>
+            </button>
+            <button class="ratio-btn" data-ratio="4:5" style="padding:8px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-secondary);font-size:11px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:all 0.15s;">
+              <div style="font-weight:600;">4:5</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Portrait</div>
+            </button>
+            <button class="ratio-btn" data-ratio="16:9" style="padding:8px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-secondary);font-size:11px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:all 0.15s;">
+              <div style="font-weight:600;">16:9</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Landscape</div>
+            </button>
+            <button class="ratio-btn" data-ratio="9:16" style="padding:8px;border-radius:6px;border:1px solid var(--border-color);background:var(--bg-secondary);font-size:11px;font-weight:500;color:var(--text-primary);cursor:pointer;transition:all 0.15s;">
+              <div style="font-weight:600;">9:16</div>
+              <div style="font-size:9px;color:var(--text-muted);margin-top:2px;">Stories</div>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Reserved space for future content -->
+    <div style="flex-shrink:0;height:60px;"></div>
+  </aside>
+</div>
+
+<!-- Footer -->
+<footer style="position:fixed;bottom:0;left:0;right:0;height:32px;background:var(--bg-primary);backdrop-filter:blur(10px);border-top:1px solid var(--border-color);display:flex;align-items:center;justify-content:center;gap:16px;font-size:11px;color:var(--text-muted);z-index:50;">
+  <span style="display:flex;align-items:center;gap:4px;"><span class="material-symbols-outlined" style="font-size:12px;color:#10b981;">lock</span> Images stay on your device</span>
+  <span>·</span>
+  <span>© 2026 PictriKit</span>
+  <span>·</span>
+  <a href="/privacy.html" style="color:var(--text-muted);text-decoration:none;">Privacy</a>
+  <span>·</span>
+  <a href="/terms.html" style="color:var(--text-muted);text-decoration:none;">Terms</a>
+</footer>
+
+<!-- Toast Container -->
+<div id="toast-container" style="position:fixed;bottom:80px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:8px;"></div>
+
+<script src="./dist/app.js?v=20260107205000"></script>
+<script>
+// Mobile panel handler - add class when panel opens
+(function() {
+  const panel = document.getElementById('panel');
+  if (!panel) return;
+  
+  // Watch for style changes on panel
+  const observer = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+        const width = panel.style.width;
+        // On mobile, add class when panel opens
+        if (window.innerWidth <= 768) {
+          if (width && width !== '0' && width !== '0px') {
+            panel.classList.add('panel-open');
+          } else {
+            panel.classList.remove('panel-open');
+          }
+        }
+      }
+    });
+  });
+  
+  observer.observe(panel, { attributes: true });
+})();
+
+// Mobile menu functionality
+(function() {
+  function initMobileMenu() {
+    console.log('[Mobile] Initializing mobile menu...');
+    
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const menuOverlay = document.getElementById('mobile-menu-overlay');
+    const menuBackdrop = document.getElementById('mobile-menu-backdrop');
+    const menuClose = document.getElementById('mobile-menu-close');
+    const menuItems = document.querySelectorAll('.mobile-menu-item');
+    const mobileBgColorBtn = document.getElementById('mobile-bg-color-btn');
+    const colorPickerPanel = document.getElementById('color-picker-panel');
+    
+    console.log('[Mobile] Elements:', {
+      menuBtn: !!menuBtn,
+      menuOverlay: !!menuOverlay,
+      menuBackdrop: !!menuBackdrop,
+      menuClose: !!menuClose,
+      menuItems: menuItems.length
+    });
+    
+    function openMenu() {
+      console.log('[Mobile] Opening menu...');
+      if (menuOverlay) {
+        menuOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        console.log('[Mobile] Menu opened, classList:', menuOverlay.classList.toString());
+      }
+    }
+    
+    function closeMenu() {
+      console.log('[Mobile] Closing menu...');
+      if (menuOverlay) {
+        menuOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+    
+    if (menuBtn) {
+      // Remove any existing listeners by cloning
+      const newMenuBtn = menuBtn.cloneNode(true);
+      menuBtn.parentNode.replaceChild(newMenuBtn, menuBtn);
+      
+      newMenuBtn.addEventListener('click', function(e) {
+        console.log('[Mobile] Menu button clicked!');
+        e.preventDefault();
+        e.stopPropagation();
+        openMenu();
+      });
+      
+      // Also add touchend for mobile
+      newMenuBtn.addEventListener('touchend', function(e) {
+        console.log('[Mobile] Menu button touched!');
+        e.preventDefault();
+        openMenu();
+      });
+      
+      console.log('[Mobile] Menu button listener attached');
+    }
+    
+    if (menuClose) {
+      menuClose.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        closeMenu();
+      });
+    }
+    
+    if (menuBackdrop) {
+      menuBackdrop.addEventListener('click', function(e) {
+        e.preventDefault();
+        closeMenu();
+      });
+    }
+    
+    // Handle menu item clicks
+    menuItems.forEach(item => {
+      item.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const tool = this.dataset.tool;
+        const action = this.dataset.action;
+        
+        console.log('[Mobile] Menu item clicked:', { tool, action });
+        
+        // Close hamburger menu first
+        closeMenu();
+        
+        if (tool) {
+          // Delay panel opening to avoid animation conflicts
+          setTimeout(() => {
+            const panel = document.getElementById('panel');
+            const panelTitle = document.getElementById('panel-title');
+            const panelTitles = {
+              linear: 'Linear Layouts',
+              focus: 'Focus Layouts',
+              grid: 'Grid Layouts',
+              compare: 'Compare Layouts',
+              frames: 'Device Frames',
+              properties: 'Style Settings'
+            };
+            
+            // Show corresponding panel content
+            document.querySelectorAll('.panel-section').forEach(section => {
+              section.style.display = 'none';
+            });
+            const targetPanel = document.querySelector(`[data-panel="${tool}"]`);
+            if (targetPanel) {
+              targetPanel.style.display = 'block';
+            }
+            
+            // Set panel title
+            if (panelTitle) {
+              panelTitle.textContent = panelTitles[tool] || tool;
+            }
+            
+            // Open panel
+            if (panel) {
+              panel.classList.add('panel-open');
+            }
+          }, 100);
+        }
+        
+        if (action) {
+          // Trigger action button click
+          const actionBtn = document.querySelector(`[data-action="${action}"]`);
+          if (actionBtn) {
+            console.log('[Mobile] Found action button, triggering click');
+            actionBtn.click();
+          }
+        }
+      });
+    });
+    
+    // Close menu on escape
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && menuOverlay && menuOverlay.classList.contains('active')) {
+        closeMenu();
+      }
+    });
+    
+    console.log('[Mobile] Mobile menu initialization complete');
+  }
+  
+  // Initialize when DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMobileMenu);
+  } else {
+    initMobileMenu();
+  }
+})();
+
+// Export panel functionality
+(function() {
+  function initExportPanel() {
+    const hdExportBtn = document.getElementById('export-hd');
+    const ratioBtns = document.querySelectorAll('.ratio-btn');
+    
+    // HD Export button
+    if (hdExportBtn) {
+      hdExportBtn.addEventListener('click', function() {
+        if (!window.app || !window.app.exportSystem) {
+          showToast('Please create a layout first');
+          return;
+        }
+        
+        showToast('Exporting in HD quality...');
+        
+        // Export with 2x scale for higher clarity
+        // This happens after render, doesn't affect layout
+        setTimeout(() => {
+          window.app.exportSystem.exportImage('png', 2);
+        }, 100);
+      });
+    }
+    
+    // Platform ratio buttons
+    ratioBtns.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const ratio = this.dataset.ratio;
+        exportWithRatio(ratio);
+      });
+    });
+  }
+  
+  function exportWithRatio(ratio) {
+    if (!window.app || !window.app.exportSystem) {
+      showToast('Please create a layout first');
+      return;
+    }
+    
+    const canvas = document.getElementById('canvas-root');
+    if (!canvas) return;
+    
+    const canvasRect = canvas.getBoundingClientRect();
+    const currentWidth = canvasRect.width;
+    const currentHeight = canvasRect.height;
+    
+    const [ratioW, ratioH] = ratio.split(':').map(Number);
+    const targetRatio = ratioW / ratioH;
+    const currentRatio = currentWidth / currentHeight;
+    
+    let newWidth, newHeight;
+    
+    // Extend canvas (never crop) to fit target ratio
+    if (currentRatio > targetRatio) {
+      // Current is wider, extend height
+      newWidth = currentWidth;
+      newHeight = currentWidth / targetRatio;
+    } else {
+      // Current is taller, extend width
+      newHeight = currentHeight;
+      newWidth = currentHeight * targetRatio;
+    }
+    
+    showToast(`Exporting as ${ratio}...`);
+    
+    // Export with extended canvas using background color fill
+    setTimeout(() => {
+      window.app.exportSystem.exportImage('png', 1, { 
+        aspectRatio: ratio,
+        extendedWidth: Math.round(newWidth),
+        extendedHeight: Math.round(newHeight)
+      });
+    }, 100);
+  }
+  
+  function showToast(message) {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    
+    const toast = document.createElement('div');
+    toast.style.cssText = 'background:var(--bg-primary);border:1px solid var(--border-color);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text-primary);box-shadow:0 4px 12px rgba(0,0,0,0.1);';
+    toast.textContent = message;
+    container.appendChild(toast);
+    
+    setTimeout(() => toast.remove(), 3000);
+  }
+  
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initExportPanel);
+  } else {
+    initExportPanel();
+  }
+})();
+</script>
+</body>
+</html>
