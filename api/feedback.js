@@ -77,8 +77,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Get feedback error:', error);
       return res.status(500).json({ 
-        error: 'Internal server error',
-        message: error.message
+        error: error?.message || String(error),
+        stack: error?.stack || null
       });
     }
   }
@@ -140,8 +140,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Submit feedback error:', error);
       return res.status(500).json({ 
-        error: 'Internal server error',
-        message: error.message
+        error: error?.message || String(error),
+        stack: error?.stack || null
       });
     }
   }
@@ -187,7 +187,10 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: 'Feedback not found' });
         } catch (kvError) {
           console.error('KV error:', kvError);
-          return res.status(500).json({ error: 'KV operation failed', message: kvError.message });
+          return res.status(500).json({ 
+            error: kvError?.message || String(kvError),
+            stack: kvError?.stack || null
+          });
         }
       }
       
@@ -196,8 +199,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Reply error:', error);
       return res.status(500).json({ 
-        error: 'Internal server error',
-        message: error.message
+        error: error?.message || String(error),
+        stack: error?.stack || null
       });
     }
   }
@@ -243,7 +246,10 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: 'Feedback not found' });
         } catch (kvError) {
           console.error('KV error:', kvError);
-          return res.status(500).json({ error: 'KV operation failed', message: kvError.message });
+          return res.status(500).json({ 
+            error: kvError?.message || String(kvError),
+            stack: kvError?.stack || null
+          });
         }
       }
       
@@ -252,8 +258,8 @@ export default async function handler(req, res) {
     } catch (error) {
       console.error('Delete error:', error);
       return res.status(500).json({ 
-        error: 'Internal server error',
-        message: error.message
+        error: error?.message || String(error),
+        stack: error?.stack || null
       });
     }
   }
