@@ -35,6 +35,14 @@ export default async function handler(req, res) {
   
   const clientIp = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
   
+  // Debug info for environment variables
+  const envDebug = {
+    hasKvUrl: !!process.env.KV_REST_API_URL,
+    hasKvToken: !!process.env.KV_REST_API_TOKEN,
+    hasAdminToken: !!process.env.FEEDBACK_ADMIN_TOKEN,
+    nodeVersion: process.version
+  };
+  
   // GET - List public feedback
   if (req.method === 'GET') {
     try {
@@ -65,14 +73,21 @@ export default async function handler(req, res) {
       }
       
       // No KV configured
-      return res.status(200).json({ success: true, feedback: [], isAdmin });
+      return res.status(200).json({ 
+        success: true, 
+        feedback: [], 
+        isAdmin,
+        debug: envDebug,
+        message: 'KV not configured, using fallback mode'
+      });
       
     } catch (error) {
       console.error('Get feedback error:', error);
       return res.status(500).json({ 
         error: 'Internal server error',
         debug: error.message,
-        stack: error.stack?.split('\n')[0]
+        stack: error.stack?.split('\n')[0],
+        envDebug: envDebug
       });
     }
   }
