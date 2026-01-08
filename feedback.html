@@ -147,42 +147,43 @@
   <div class="toast" id="toast"></div>
 
   <script>
-  (function() {
+  document.addEventListener('DOMContentLoaded', function() {
     // DOM elements
-    const input = document.getElementById('feedback-input');
-    const charCount = document.getElementById('char-count');
-    const submitBtn = document.getElementById('submit-btn');
-    const messagesList = document.getElementById('messages-list');
-    const messagesCount = document.getElementById('messages-count');
-    const toast = document.getElementById('toast');
-    const adminBadge = document.getElementById('admin-badge');
+    var input = document.getElementById('feedback-input');
+    var charCount = document.getElementById('char-count');
+    var submitBtn = document.getElementById('submit-btn');
+    var messagesList = document.getElementById('messages-list');
+    var messagesCount = document.getElementById('messages-count');
+    var toast = document.getElementById('toast');
+    var adminBadge = document.getElementById('admin-badge');
     
-    // State - initialized once at startup
-    let feedbackData = [];
+    // State
+    var feedbackData = [];
     
-    // Admin state - determined once at page load, never changes
-    const urlParams = new URLSearchParams(window.location.search);
-    const adminTokenFromUrl = urlParams.get('admin');
+    // Admin state - check URL first, then localStorage
+    var urlParams = new URLSearchParams(window.location.search);
+    var adminTokenFromUrl = urlParams.get('admin');
     if (adminTokenFromUrl) {
       localStorage.setItem('pictrikit_admin_token', adminTokenFromUrl);
       window.history.replaceState({}, '', window.location.pathname);
     }
-    const adminToken = localStorage.getItem('pictrikit_admin_token');
-    const isAdmin = !!adminToken;
+    var adminToken = localStorage.getItem('pictrikit_admin_token');
+    var isAdmin = adminToken && adminToken.length > 0;
     
-    // Show admin badge immediately if admin
+    // Show admin badge if admin
     if (isAdmin) {
       adminBadge.style.display = 'inline-flex';
+      console.log('Admin mode enabled');
     }
     
     function generateUsername() {
-      const adj = ['Happy', 'Swift', 'Clever', 'Bright', 'Cool', 'Quick', 'Smart', 'Calm', 'Bold', 'Kind'];
-      const noun = ['Panda', 'Eagle', 'Tiger', 'Fox', 'Wolf', 'Bear', 'Hawk', 'Lion', 'Owl', 'Deer'];
+      var adj = ['Happy', 'Swift', 'Clever', 'Bright', 'Cool', 'Quick', 'Smart', 'Calm', 'Bold', 'Kind'];
+      var noun = ['Panda', 'Eagle', 'Tiger', 'Fox', 'Wolf', 'Bear', 'Hawk', 'Lion', 'Owl', 'Deer'];
       return adj[Math.floor(Math.random() * adj.length)] + noun[Math.floor(Math.random() * noun.length)] + Math.floor(Math.random() * 1000);
     }
     
     function getUserId() {
-      let id = localStorage.getItem('pictrikit_user_id');
+      var id = localStorage.getItem('pictrikit_user_id');
       if (!id) {
         id = generateUsername();
         localStorage.setItem('pictrikit_user_id', id);
@@ -283,9 +284,18 @@
         return;
       }
       
-      document.querySelectorAll('.admin-reply-form').forEach(function(f) { f.remove(); });
+      var allForms = document.querySelectorAll('.admin-reply-form');
+      for (var i = 0; i < allForms.length; i++) {
+        allForms[i].remove();
+      }
       
-      var item = feedbackData.find(function(m) { return m.id === id; });
+      var item = null;
+      for (var j = 0; j < feedbackData.length; j++) {
+        if (feedbackData[j].id === id) {
+          item = feedbackData[j];
+          break;
+        }
+      }
       var currentReply = item ? (item.reply || '') : '';
       
       var form = document.createElement('div');
@@ -301,6 +311,7 @@
     
     function renderMessages() {
       var messages = feedbackData;
+      console.log('Rendering', messages.length, 'messages, isAdmin:', isAdmin);
       
       if (!messages || messages.length === 0) {
         messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">chat_bubble_outline</span><p>No messages yet. Be the first to share feedback!</p></div>';
@@ -308,8 +319,13 @@
         return;
       }
       
-      // Show all non-deleted messages (admin sees deleted too)
-      var visibleMessages = messages.filter(function(m) { return !m.deleted || isAdmin; });
+      var visibleMessages = [];
+      for (var i = 0; i < messages.length; i++) {
+        if (!messages[i].deleted || isAdmin) {
+          visibleMessages.push(messages[i]);
+        }
+      }
+      
       messagesCount.textContent = visibleMessages.length + ' message' + (visibleMessages.length !== 1 ? 's' : '');
       
       var html = '';
@@ -332,18 +348,27 @@
       messagesList.innerHTML = html;
       
       // Bind events
-      messagesList.querySelectorAll('[data-action="reply"]').forEach(function(btn) {
-        btn.onclick = function() { toggleReplyForm(btn.dataset.id); };
-      });
-      messagesList.querySelectorAll('[data-action="delete"]').forEach(function(btn) {
-        btn.onclick = function() { deleteFeedback(btn.dataset.id); };
-      });
+      var replyBtns = messagesList.querySelectorAll('[data-action="reply"]');
+      for (var k = 0; k < replyBtns.length; k++) {
+        (function(btn) {
+          btn.onclick = function() { toggleReplyForm(btn.dataset.id); };
+        })(replyBtns[k]);
+      }
+      
+      var deleteBtns = messagesList.querySelectorAll('[data-action="delete"]');
+      for (var l = 0; l < deleteBtns.length; l++) {
+        (function(btn) {
+          btn.onclick = function() { deleteFeedback(btn.dataset.id); };
+        })(deleteBtns[l]);
+      }
     }
     
     function loadMessages() {
+      console.log('Loading messages...');
       fetch('/api/feedback').then(function(res) {
         return res.json();
       }).then(function(data) {
+        console.log('API response:', data);
         if (data.success && data.feedback) {
           feedbackData = data.feedback;
           renderMessages();
@@ -358,8 +383,7 @@
     
     // Character count
     input.addEventListener('input', function() {
-      var len = input.value.length;
-      charCount.textContent = len;
+      charCount.textContent = input.value.length;
     });
     
     // Submit feedback
@@ -397,9 +421,9 @@
       });
     });
     
-    // Load on page ready
+    // Load messages on page ready
     loadMessages();
-  })();
+  });
   </script>
 </body>
 </html>
