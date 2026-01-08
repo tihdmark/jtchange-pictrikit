@@ -1,0 +1,7 @@
+dev-files/
+node_modules/
+.git/
+.vscode/
+*.log
+.DS_Store
+README.md

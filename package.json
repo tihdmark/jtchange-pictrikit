@@ -1,16 +1,9 @@
 {
   "name": "pictrikit",
   "version": "1.0.0",
+  "private": true,
   "description": "Free screenshot layout tool - Create beautiful image compositions",
-  "main": "index.js",
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'Static site - no build needed'",
-    "start": "vercel dev"
-  },
-  "keywords": ["screenshot", "layout", "image", "tool", "vercel"],
-  "author": "PictriKit Team",
-  "license": "MIT",
+  "type": "module",
   "dependencies": {
     "@vercel/kv": "^3.0.0"
   },
