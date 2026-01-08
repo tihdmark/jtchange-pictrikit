@@ -368,7 +368,6 @@
     
     async function loadMessages() {
       try {
-        // Always fetch without admin header first to get public data
         const res = await fetch('/api/feedback');
         const data = await res.json();
         
@@ -377,27 +376,12 @@
           return;
         }
         
-        // If we have an admin token, verify it separately
+        // Check admin status based on stored token
         if (adminToken) {
-          const adminRes = await fetch('/api/feedback', { 
-            headers: { 'X-Admin-Token': adminToken } 
-          });
-          const adminData = await adminRes.json();
-          
-          if (adminData.isAdmin === true) {
-            isAdmin = true;
-            adminBadge.style.display = 'inline-flex';
-            // Use admin data which may include deleted items
-            renderMessages(adminData.feedback || []);
-            return;
-          } else {
-            // Invalid token, clear it
-            localStorage.removeItem('pictrikit_admin_token');
-            adminToken = null;
-          }
+          isAdmin = true;
+          adminBadge.style.display = 'inline-flex';
         }
         
-        // Render public data
         renderMessages(data.feedback || []);
       } catch (e) {
         console.error('Load error:', e);
