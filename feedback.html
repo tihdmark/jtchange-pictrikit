@@ -114,7 +114,7 @@
       <section class="feedback-form" aria-label="Submit your feedback">
         <h2 class="form-heading">Share Your Feedback</h2>
         <label class="form-label" for="feedback-input">Your message</label>
-        <textarea class="form-textarea" id="feedback-input" placeholder="Describe your suggestion, question, or issue..."></textarea>
+        <textarea class="form-textarea" id="feedback-input" rows="4" placeholder="Describe your suggestion, question, or issue..."></textarea>
         <div class="form-footer">
           <span class="char-count"><span id="char-count">0</span> / 1000</span>
           <button class="submit-btn" id="submit-btn">Send Feedback</button>
@@ -148,6 +148,7 @@
 
   <script>
   (function() {
+    // DOM elements
     const input = document.getElementById('feedback-input');
     const charCount = document.getElementById('char-count');
     const submitBtn = document.getElementById('submit-btn');
@@ -156,14 +157,22 @@
     const toast = document.getElementById('toast');
     const adminBadge = document.getElementById('admin-badge');
     
-    const urlParams = new URLSearchParams(window.location.search);
-    let adminToken = urlParams.get('admin') || localStorage.getItem('pictrikit_admin_token');
-    let isAdmin = false;
+    // State - initialized once at startup
     let feedbackData = [];
     
-    if (urlParams.get('admin')) {
-      localStorage.setItem('pictrikit_admin_token', urlParams.get('admin'));
+    // Admin state - determined once at page load, never changes
+    const urlParams = new URLSearchParams(window.location.search);
+    const adminTokenFromUrl = urlParams.get('admin');
+    if (adminTokenFromUrl) {
+      localStorage.setItem('pictrikit_admin_token', adminTokenFromUrl);
       window.history.replaceState({}, '', window.location.pathname);
+    }
+    const adminToken = localStorage.getItem('pictrikit_admin_token');
+    const isAdmin = !!adminToken;
+    
+    // Show admin badge immediately if admin
+    if (isAdmin) {
+      adminBadge.style.display = 'inline-flex';
     }
     
     function generateUsername() {
@@ -181,19 +190,19 @@
       return id;
     }
     
-    function showToast(msg, type = 'success') {
+    function showToast(msg, type) {
       toast.textContent = msg;
       toast.className = 'toast show' + (type === 'error' ? ' error' : '');
-      setTimeout(() => toast.classList.remove('show'), 3000);
+      setTimeout(function() { toast.classList.remove('show'); }, 3000);
     }
     
     function formatDate(ts) {
       if (!ts) return '';
       try {
-        const d = new Date(ts);
+        var d = new Date(ts);
         if (isNaN(d.getTime())) return '';
-        const now = new Date();
-        const diff = now - d;
+        var now = new Date();
+        var diff = now - d;
         if (diff < 60000) return 'Just now';
         if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
         if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
@@ -210,44 +219,42 @@
     
     function escapeHtml(str) {
       if (!str) return '';
-      const div = document.createElement('div');
+      var div = document.createElement('div');
       div.textContent = str;
       return div.innerHTML;
     }
     
-    async function deleteFeedback(id) {
+    function deleteFeedback(id) {
       if (!confirm('Delete this message?')) return;
-      try {
-        const res = await fetch('/api/feedback', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
-          body: JSON.stringify({ feedbackId: id })
-        });
+      fetch('/api/feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+        body: JSON.stringify({ feedbackId: id })
+      }).then(function(res) {
         if (res.ok) {
           showToast('Message deleted');
           loadMessages();
         } else {
           showToast('Delete failed', 'error');
         }
-      } catch (e) {
+      }).catch(function() {
         showToast('Delete failed', 'error');
-      }
+      });
     }
     
-    async function submitReply(id, btn) {
-      const form = btn.closest('.admin-reply-form');
-      const textarea = form.querySelector('textarea');
-      const reply = textarea.value.trim();
+    function submitReply(id, btn) {
+      var form = btn.closest('.admin-reply-form');
+      var textarea = form.querySelector('textarea');
+      var reply = textarea.value.trim();
       
       btn.disabled = true;
       btn.textContent = 'Saving...';
       
-      try {
-        const res = await fetch('/api/feedback', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
-          body: JSON.stringify({ feedbackId: id, reply: reply || null })
-        });
+      fetch('/api/feedback', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+        body: JSON.stringify({ feedbackId: id, reply: reply || null })
+      }).then(function(res) {
         if (res.ok) {
           showToast(reply ? 'Reply saved' : 'Reply removed');
           textarea.value = '';
@@ -255,50 +262,45 @@
         } else {
           showToast('Reply failed', 'error');
         }
-      } catch (e) {
+        setTimeout(function() {
+          btn.disabled = false;
+          btn.textContent = 'Save Reply';
+        }, 1000);
+      }).catch(function() {
         showToast('Reply failed', 'error');
-      }
-      
-      setTimeout(() => {
         btn.disabled = false;
         btn.textContent = 'Save Reply';
-      }, 1000);
+      });
     }
     
     function toggleReplyForm(id) {
-      const card = document.querySelector(`[data-id="${id}"]`);
+      var card = document.querySelector('[data-id="' + id + '"]');
       if (!card) return;
       
-      const existingForm = card.querySelector('.admin-reply-form');
+      var existingForm = card.querySelector('.admin-reply-form');
       if (existingForm) {
         existingForm.remove();
         return;
       }
       
-      document.querySelectorAll('.admin-reply-form').forEach(f => f.remove());
+      document.querySelectorAll('.admin-reply-form').forEach(function(f) { f.remove(); });
       
-      const item = feedbackData.find(m => m.id === id);
-      const currentReply = item ? item.reply || '' : '';
+      var item = feedbackData.find(function(m) { return m.id === id; });
+      var currentReply = item ? (item.reply || '') : '';
       
-      const form = document.createElement('div');
+      var form = document.createElement('div');
       form.className = 'admin-reply-form';
-      form.innerHTML = `
-        <textarea placeholder="Write your official reply...">${escapeHtml(currentReply)}</textarea>
-        <div class="admin-reply-form-actions">
-          <button class="cancel-btn" type="button">Cancel</button>
-          <button class="save-btn" type="button">Save Reply</button>
-        </div>
-      `;
+      form.innerHTML = '<textarea rows="4" placeholder="Write your official reply...">' + escapeHtml(currentReply) + '</textarea><div class="admin-reply-form-actions"><button class="cancel-btn" type="button">Cancel</button><button class="save-btn" type="button">Save Reply</button></div>';
       
-      form.querySelector('.cancel-btn').onclick = () => form.remove();
+      form.querySelector('.cancel-btn').onclick = function() { form.remove(); };
       form.querySelector('.save-btn').onclick = function() { submitReply(id, this); };
       
       card.appendChild(form);
       form.querySelector('textarea').focus();
     }
     
-    function renderMessages(messages) {
-      feedbackData = messages || [];
+    function renderMessages() {
+      var messages = feedbackData;
       
       if (!messages || messages.length === 0) {
         messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">chat_bubble_outline</span><p>No messages yet. Be the first to share feedback!</p></div>';
@@ -306,122 +308,79 @@
         return;
       }
       
-      const visibleMessages = messages.filter(m => !m.deleted || isAdmin);
+      // Show all non-deleted messages (admin sees deleted too)
+      var visibleMessages = messages.filter(function(m) { return !m.deleted || isAdmin; });
       messagesCount.textContent = visibleMessages.length + ' message' + (visibleMessages.length !== 1 ? 's' : '');
       
-      messagesList.innerHTML = visibleMessages.map(m => {
-        let replyHtml = '';
+      var html = '';
+      for (var i = 0; i < visibleMessages.length; i++) {
+        var m = visibleMessages[i];
+        
+        var replyHtml = '';
         if (m.reply) {
-          replyHtml = `
-            <aside class="reply-card">
-              <header class="reply-header">
-                <span class="creator-badge">Official</span>
-                <h4 class="reply-name">PictriKit Team</h4>
-              </header>
-              <p class="reply-content">${escapeHtml(m.reply)}</p>
-            </aside>
-          `;
+          replyHtml = '<aside class="reply-card"><header class="reply-header"><span class="creator-badge">Official</span><h4 class="reply-name">PictriKit Team</h4></header><p class="reply-content">' + escapeHtml(m.reply) + '</p></aside>';
         }
         
-        let adminHtml = '';
+        var adminHtml = '';
         if (isAdmin) {
-          adminHtml = `
-            <div class="admin-actions">
-              <button class="admin-btn reply-btn" data-action="reply" data-id="${m.id}">
-                <span class="material-icons-round">reply</span>
-                ${m.reply ? 'Edit Reply' : 'Add Reply'}
-              </button>
-              <button class="admin-btn delete-btn" data-action="delete" data-id="${m.id}">
-                <span class="material-icons-round">delete</span>
-                Delete
-              </button>
-            </div>
-          `;
+          adminHtml = '<div class="admin-actions"><button class="admin-btn reply-btn" data-action="reply" data-id="' + m.id + '"><span class="material-icons-round">reply</span>' + (m.reply ? 'Edit Reply' : 'Add Reply') + '</button><button class="admin-btn delete-btn" data-action="delete" data-id="' + m.id + '"><span class="material-icons-round">delete</span>Delete</button></div>';
         }
         
-        return `
-          <article class="message-card${m.deleted ? ' deleted' : ''}" data-id="${m.id}">
-            <header class="message-header">
-              <div class="message-user">
-                <div class="user-avatar">${getInitials(m.username)}</div>
-                <h3 class="user-name">${escapeHtml(m.username || 'Anonymous')}</h3>
-                ${m.deleted ? '<span style="color:#dc2626;font-size:0.75rem;">(deleted)</span>' : ''}
-              </div>
-              <time class="message-time">${formatDate(m.created_at)}</time>
-            </header>
-            <div class="message-body">
-              <p class="message-content">${escapeHtml(m.content)}</p>
-            </div>
-            ${replyHtml}
-            ${adminHtml}
-          </article>
-        `;
-      }).join('');
+        html += '<article class="message-card' + (m.deleted ? ' deleted' : '') + '" data-id="' + m.id + '"><header class="message-header"><div class="message-user"><div class="user-avatar">' + getInitials(m.username) + '</div><h3 class="user-name">' + escapeHtml(m.username || 'Anonymous') + '</h3>' + (m.deleted ? '<span style="color:#dc2626;font-size:0.75rem;">(deleted)</span>' : '') + '</div><time class="message-time">' + formatDate(m.created_at) + '</time></header><div class="message-body"><p class="message-content">' + escapeHtml(m.content) + '</p></div>' + replyHtml + adminHtml + '</article>';
+      }
       
-      messagesList.querySelectorAll('[data-action="reply"]').forEach(btn => {
-        btn.onclick = () => toggleReplyForm(btn.dataset.id);
+      messagesList.innerHTML = html;
+      
+      // Bind events
+      messagesList.querySelectorAll('[data-action="reply"]').forEach(function(btn) {
+        btn.onclick = function() { toggleReplyForm(btn.dataset.id); };
       });
-      messagesList.querySelectorAll('[data-action="delete"]').forEach(btn => {
-        btn.onclick = () => deleteFeedback(btn.dataset.id);
+      messagesList.querySelectorAll('[data-action="delete"]').forEach(function(btn) {
+        btn.onclick = function() { deleteFeedback(btn.dataset.id); };
       });
     }
     
-    async function loadMessages() {
-      try {
-        const res = await fetch('/api/feedback');
-        const data = await res.json();
-        
-        if (!data.success) {
+    function loadMessages() {
+      fetch('/api/feedback').then(function(res) {
+        return res.json();
+      }).then(function(data) {
+        if (data.success && data.feedback) {
+          feedbackData = data.feedback;
+          renderMessages();
+        } else {
           messagesList.innerHTML = '<div class="empty-state"><p>Failed to load messages</p></div>';
-          return;
         }
-        
-        // Check admin status based on stored token
-        if (adminToken) {
-          isAdmin = true;
-          adminBadge.style.display = 'inline-flex';
-        }
-        
-        renderMessages(data.feedback || []);
-      } catch (e) {
+      }).catch(function(e) {
         console.error('Load error:', e);
         messagesList.innerHTML = '<div class="empty-state"><p>Failed to load messages</p></div>';
-      }
+      });
     }
     
-    input.addEventListener('input', () => {
-      const len = input.value.length;
+    // Character count
+    input.addEventListener('input', function() {
+      var len = input.value.length;
       charCount.textContent = len;
-      if (len > 1000) {
-        input.value = input.value.slice(0, 1000);
-        charCount.textContent = 1000;
-      }
     });
     
-    submitBtn.addEventListener('click', async () => {
-      const content = input.value.trim();
+    // Submit feedback
+    submitBtn.addEventListener('click', function() {
+      var content = input.value.trim();
       if (content.length < 3) {
         showToast('Please enter at least 3 characters', 'error');
-        return;
-      }
-      if (content.length > 1000) {
-        showToast('Message too long (max 1000 characters)', 'error');
         return;
       }
       
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending...';
       
-      try {
-        const res = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content, username: getUserId() })
-        });
-        
-        const data = await res.json();
-        
-        if (res.ok && data.success) {
+      fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: content, username: getUserId() })
+      }).then(function(res) {
+        return res.json();
+      }).then(function(data) {
+        if (data.success) {
           showToast('Thanks for your feedback!');
           input.value = '';
           charCount.textContent = '0';
@@ -429,14 +388,16 @@
         } else {
           showToast(data.error || 'Failed to send', 'error');
         }
-      } catch (e) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Feedback';
+      }).catch(function() {
         showToast('Network error', 'error');
-      }
-      
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Send Feedback';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Feedback';
+      });
     });
     
+    // Load on page ready
     loadMessages();
   })();
   </script>
