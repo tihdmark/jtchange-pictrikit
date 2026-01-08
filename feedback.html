@@ -368,17 +368,39 @@
     
     async function loadMessages() {
       try {
-        const headers = adminToken ? { 'X-Admin-Token': adminToken } : {};
-        const res = await fetch('/api/feedback', { headers });
+        // Always fetch without admin header first to get public data
+        const res = await fetch('/api/feedback');
         const data = await res.json();
         
-        isAdmin = data.isAdmin === true;
-        if (isAdmin) {
-          adminBadge.style.display = 'inline-flex';
+        if (!data.success) {
+          messagesList.innerHTML = '<div class="empty-state"><p>Failed to load messages</p></div>';
+          return;
         }
         
+        // If we have an admin token, verify it separately
+        if (adminToken) {
+          const adminRes = await fetch('/api/feedback', { 
+            headers: { 'X-Admin-Token': adminToken } 
+          });
+          const adminData = await adminRes.json();
+          
+          if (adminData.isAdmin === true) {
+            isAdmin = true;
+            adminBadge.style.display = 'inline-flex';
+            // Use admin data which may include deleted items
+            renderMessages(adminData.feedback || []);
+            return;
+          } else {
+            // Invalid token, clear it
+            localStorage.removeItem('pictrikit_admin_token');
+            adminToken = null;
+          }
+        }
+        
+        // Render public data
         renderMessages(data.feedback || []);
       } catch (e) {
+        console.error('Load error:', e);
         messagesList.innerHTML = '<div class="empty-state"><p>Failed to load messages</p></div>';
       }
     }
