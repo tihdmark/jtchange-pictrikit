@@ -1,5 +1,5 @@
-// Debug endpoint to check environment variables and Redis connection
-import Redis from 'ioredis';
+// Debug endpoint to check environment variables and Upstash Redis connection
+import { Redis } from '@upstash/redis';
 
 export default async function handler(req, res) {
   // Only allow GET requests
@@ -9,31 +9,23 @@ export default async function handler(req, res) {
 
   try {
     const envCheck = {
-      REDIS_URL: !!process.env.REDIS_URL,
-      KV_REST_API_URL: !!process.env.KV_REST_API_URL,
-      KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN,
+      UPSTASH_REDIS_REST_URL: !!process.env.UPSTASH_REDIS_REST_URL,
+      UPSTASH_REDIS_REST_TOKEN: !!process.env.UPSTASH_REDIS_REST_TOKEN,
       FEEDBACK_ADMIN_TOKEN: !!process.env.FEEDBACK_ADMIN_TOKEN,
       nodeVersion: process.version,
       timestamp: new Date().toISOString()
     };
 
-    // Test Redis connection if configured
+    // Test Upstash Redis connection if configured
     let redisTest = { status: 'not_configured' };
-    const url = process.env.KV_REST_API_URL || process.env.REDIS_URL;
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
     
-    if (url) {
+    if (url && token) {
       try {
-        const redis = new Redis(url, {
-          maxRetriesPerRequest: 1,
-          retryStrategy: () => null,
-          enableReadyCheck: false,
-          connectTimeout: 5000,
-        });
-        
+        const redis = new Redis({ url, token });
         await redis.ping();
-        await redis.quit();
-        
-        redisTest = { status: 'connected', message: 'Redis connection successful', url: url.split('@')[1] || 'hidden' };
+        redisTest = { status: 'connected', message: 'Upstash Redis connection successful' };
       } catch (redisError) {
         redisTest = { 
           status: 'error', 
