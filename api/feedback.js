@@ -42,10 +42,15 @@ export default async function handler(req, res) {
     try {
       const isAdmin = req.headers['x-admin-token'] === process.env.FEEDBACK_ADMIN_TOKEN;
       
+      console.log('GET /api/feedback - Admin:', isAdmin);
+      console.log('GET /api/feedback - KV configured:', !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN));
+      
       // Try Vercel KV
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
         try {
           const feedbackList = await kv.lrange('pictrikit:feedback', 0, 100);
+          console.log('✅ KV read successful - Count:', feedbackList.length);
+          
           const parsed = feedbackList.map(item => {
             try { 
               const f = typeof item === 'string' ? JSON.parse(item) : item;
@@ -65,13 +70,14 @@ export default async function handler(req, res) {
           
           return res.status(200).json({ success: true, feedback: parsed, isAdmin });
         } catch (kvError) {
-          console.error('KV error:', kvError);
+          console.error('❌ KV read error:', kvError.message);
           // Fallback to empty array if KV fails
-          return res.status(200).json({ success: true, feedback: [], isAdmin });
+          return res.status(200).json({ success: true, feedback: [], isAdmin, error: 'KV read failed' });
         }
       }
       
       // No KV configured - return standard response
+      console.log('⚠️ KV not configured - returning empty array');
       return res.status(200).json({ success: true, feedback: [], isAdmin });
       
     } catch (error) {
@@ -91,6 +97,10 @@ export default async function handler(req, res) {
     }
     
     try {
+      // Debug: Log request body
+      console.log('POST /api/feedback - Body:', JSON.stringify(req.body));
+      console.log('POST /api/feedback - KV configured:', !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN));
+      
       const { content, username, timestamp, url, userAgent } = req.body;
       
       // Validation
@@ -124,18 +134,31 @@ export default async function handler(req, res) {
       };
       
       // Store in Vercel KV
+      let kvStored = false;
       if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
         try {
           await kv.lpush('pictrikit:feedback', JSON.stringify(feedback));
+          kvStored = true;
+          console.log('✅ KV storage successful:', feedback.id);
         } catch (kvError) {
-          console.error('KV storage failed:', kvError);
+          console.error('❌ KV storage failed:', kvError.message);
           // Continue execution even if KV fails
         }
+      } else {
+        console.log('⚠️ KV not configured - feedback logged only');
       }
       
       console.log('FEEDBACK:', JSON.stringify(feedback));
       
-      return res.status(200).json({ success: true, id: feedback.id });
+      return res.status(200).json({ 
+        success: true, 
+        id: feedback.id,
+        stored: kvStored,
+        debug: {
+          kvConfigured: !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN),
+          timestamp: new Date().toISOString()
+        }
+      });
       
     } catch (error) {
       console.error('Submit feedback error:', error);
