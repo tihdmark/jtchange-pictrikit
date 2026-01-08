@@ -212,33 +212,56 @@
       return div.innerHTML;
     }
     
-    // ========== Admin Mode 初始化 (只执行一次，在 render 之后调用) ==========
+    // ========== Admin Mode 初始化 (只执行一次) ==========
     function initAdminMode() {
+      console.log('initAdminMode called');
+      
       // 检查 URL 参数
       var urlParams = new URLSearchParams(window.location.search);
       var adminTokenFromUrl = urlParams.get('admin');
+      console.log('URL admin token:', adminTokenFromUrl ? 'present' : 'none');
+      
       if (adminTokenFromUrl) {
         localStorage.setItem('pictrikit_admin_token', adminTokenFromUrl);
         window.history.replaceState({}, '', window.location.pathname);
+        console.log('Saved admin token to localStorage');
       }
       
       // 从 localStorage 读取 token
       adminToken = localStorage.getItem('pictrikit_admin_token');
+      console.log('localStorage admin token:', adminToken ? 'present (' + adminToken.length + ' chars)' : 'none');
+      
       if (adminToken && adminToken.length > 0) {
         isAdmin = true;
         document.body.classList.add('admin-mode');
-        adminBadge.style.display = 'inline-flex';
+        if (adminBadge) {
+          adminBadge.style.display = 'inline-flex';
+          console.log('Admin badge shown');
+        }
+        console.log('Admin mode ENABLED');
+      } else {
+        console.log('Admin mode disabled (no valid token)');
       }
     }
     
     // ========== API 操作 ==========
     function fetchFeedback() {
-      return fetch('/api/feedback')
+      // 添加时间戳防止浏览器缓存
+      var url = '/api/feedback?_t=' + Date.now();
+      return fetch(url, {
+        method: 'GET',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      })
         .then(function(res) { return res.json(); })
         .then(function(data) {
+          console.log('API response:', data);
           if (data.success && data.feedback) {
             return data.feedback;
           }
+          console.warn('API returned empty or failed:', data);
           return [];
         })
         .catch(function(e) {
@@ -467,17 +490,25 @@
     
     // ========== 初始化入口 (严格顺序) ==========
     async function initFeedback() {
+      console.log('=== initFeedback START ===');
+      
       // 1. 先初始化 Admin Mode (读取 localStorage)
       initAdminMode();
+      console.log('Step 1 done: isAdmin =', isAdmin);
       
       // 2. 获取数据
       var feedback = await fetchFeedback();
+      console.log('Step 2 done: got', feedback.length, 'messages');
       
       // 3. 渲染 (isAdmin 已确定，一次性渲染完整 UI)
       renderFeedback(feedback);
+      console.log('Step 3 done: rendered');
       
       // 4. 绑定表单事件
       bindFormEvents();
+      console.log('Step 4 done: events bound');
+      
+      console.log('=== initFeedback COMPLETE ===');
     }
     
     // 启动
