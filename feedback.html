@@ -239,16 +239,22 @@
       setTimeout(() => toast.classList.remove('show'), 3000);
     }
     
-    // Format time
-    function formatTime(ts) {
-      const d = new Date(ts);
-      const now = new Date();
-      const diff = now - d;
-      if (diff < 60000) return 'Just now';
-      if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
-      if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
-      if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    // Format date safely
+    function formatDate(ts) {
+      if (!ts) return '';
+      try {
+        const d = new Date(ts);
+        if (isNaN(d.getTime())) return '';
+        const now = new Date();
+        const diff = now - d;
+        if (diff < 60000) return 'Just now';
+        if (diff < 3600000) return Math.floor(diff / 60000) + 'm ago';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + 'h ago';
+        if (diff < 604800000) return Math.floor(diff / 86400000) + 'd ago';
+        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      } catch (e) {
+        return '';
+      }
     }
     
     // Get initials
@@ -387,7 +393,7 @@
                 <h3 class="user-name">${escapeHtml(m.username || 'Anonymous')}</h3>
                 ${m.deleted ? '<span style="color:#dc2626;font-size:0.75rem;">(deleted)</span>' : ''}
               </div>
-              <time class="message-time" datetime="${m.timestamp}">${formatTime(m.timestamp)}</time>
+              <time class="message-time" datetime="${m.created_at || m.timestamp}">${formatDate(m.created_at || m.timestamp)}</time>
             </header>
             <div class="message-body">
               <p class="message-content">${escapeHtml(m.content)}</p>
@@ -431,8 +437,8 @@
     // Submit
     submitBtn.addEventListener('click', async () => {
       const content = input.value.trim();
-      if (!content) {
-        showToast('Please enter a message', 'error');
+      if (!content || content.length < 3) {
+        showToast('Please enter at least 3 characters', 'error');
         return;
       }
       
