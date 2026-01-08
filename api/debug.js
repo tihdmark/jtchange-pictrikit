@@ -24,12 +24,12 @@ export default async function handler(req, res) {
     if (url) {
       try {
         const redis = new Redis(url, {
-          maxRetriesPerRequest: 3,
+          maxRetriesPerRequest: 1,
+          retryStrategy: () => null,
           enableReadyCheck: false,
-          lazyConnect: true,
+          connectTimeout: 5000,
         });
         
-        await redis.connect();
         await redis.ping();
         await redis.quit();
         
