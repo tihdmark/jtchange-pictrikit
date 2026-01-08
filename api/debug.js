@@ -1,4 +1,6 @@
-// Debug endpoint to check environment variables and KV connection
+// Debug endpoint to check environment variables and Redis connection
+import { Redis } from '@upstash/redis';
+
 export default async function handler(req, res) {
   // Only allow GET requests
   if (req.method !== 'GET') {
@@ -7,6 +9,8 @@ export default async function handler(req, res) {
 
   try {
     const envCheck = {
+      UPSTASH_REDIS_REST_URL: !!process.env.UPSTASH_REDIS_REST_URL,
+      UPSTASH_REDIS_REST_TOKEN: !!process.env.UPSTASH_REDIS_REST_TOKEN,
       KV_REST_API_URL: !!process.env.KV_REST_API_URL,
       KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN,
       FEEDBACK_ADMIN_TOKEN: !!process.env.FEEDBACK_ADMIN_TOKEN,
@@ -14,18 +18,21 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString()
     };
 
-    // Test KV connection if configured
-    let kvTest = { status: 'not_configured' };
-    if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+    // Test Redis connection if configured
+    let redisTest = { status: 'not_configured' };
+    const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+    
+    if (url && token) {
       try {
-        const { kv } = await import('@vercel/kv');
-        await kv.ping();
-        kvTest = { status: 'connected', message: 'KV connection successful' };
-      } catch (kvError) {
-        kvTest = { 
+        const redis = new Redis({ url, token });
+        await redis.ping();
+        redisTest = { status: 'connected', message: 'Redis connection successful' };
+      } catch (redisError) {
+        redisTest = { 
           status: 'error', 
-          message: kvError.message,
-          stack: kvError.stack?.split('\n')[0]
+          message: redisError.message,
+          stack: redisError.stack?.split('\n')[0]
         };
       }
     }
@@ -33,7 +40,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       success: true,
       environment: envCheck,
-      kv: kvTest,
+      redis: redisTest,
       message: 'Debug info retrieved successfully'
     });
 
