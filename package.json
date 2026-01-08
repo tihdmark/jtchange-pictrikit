@@ -2,12 +2,8 @@
   "name": "pictrikit",
   "version": "1.0.0",
   "private": true,
-  "description": "Free screenshot layout tool - Create beautiful image compositions",
   "type": "module",
   "dependencies": {
     "@vercel/kv": "^3.0.0"
-  },
-  "engines": {
-    "node": ">=18.0.0"
   }
 }
