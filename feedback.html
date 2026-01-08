@@ -147,28 +147,168 @@
   <div class="toast" id="toast"></div>
 
   <script>
-  // ========== 最小化测试版本 ==========
   document.addEventListener('DOMContentLoaded', function() {
+    // DOM
     var messagesList = document.getElementById('messages-list');
-    
-    console.log('=== MINIMAL TEST START ===');
-    console.log('Time:', new Date().toISOString());
-    
-    // 只做一件事：fetch 并打印结果
-    fetch('/api/feedback?_t=' + Date.now())
-      .then(function(res) {
-        console.log('Response status:', res.status);
-        console.log('Response headers:', Object.fromEntries(res.headers.entries()));
-        return res.text();
-      })
-      .then(function(text) {
-        console.log('Raw response:', text);
-        messagesList.innerHTML = '<pre style="text-align:left;font-size:12px;overflow:auto;">' + text + '</pre>';
-      })
-      .catch(function(e) {
-        console.error('Fetch error:', e);
-        messagesList.innerHTML = '<p style="color:red;">Error: ' + e.message + '</p>';
+    var messagesCount = document.getElementById('messages-count');
+    var adminBadge = document.getElementById('admin-badge');
+    var input = document.getElementById('feedback-input');
+    var charCount = document.getElementById('char-count');
+    var submitBtn = document.getElementById('submit-btn');
+    var toast = document.getElementById('toast');
+
+    // State
+    var isAdmin = false;
+    var adminToken = null;
+    var feedbackData = [];
+
+    // Utils
+    function showToast(msg, err) {
+      toast.textContent = msg;
+      toast.className = 'toast show' + (err ? ' error' : '');
+      setTimeout(function() { toast.className = 'toast'; }, 3000);
+    }
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    function timeAgo(ts) {
+      if (!ts) return '';
+      var d = new Date(ts), now = new Date(), diff = now - d;
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) return Math.floor(diff/60000) + 'm ago';
+      if (diff < 86400000) return Math.floor(diff/3600000) + 'h ago';
+      return d.toLocaleDateString('en-US', {month:'short',day:'numeric'});
+    }
+
+    function getUserId() {
+      var id = localStorage.getItem('pictrikit_user_id');
+      if (!id) {
+        var adj = ['Happy','Swift','Clever','Bright','Cool'];
+        var noun = ['Panda','Eagle','Tiger','Fox','Wolf'];
+        id = adj[Math.floor(Math.random()*5)] + noun[Math.floor(Math.random()*5)] + Math.floor(Math.random()*1000);
+        localStorage.setItem('pictrikit_user_id', id);
+      }
+      return id;
+    }
+
+    // Admin Mode (独立，不依赖 fetch)
+    function initAdminMode() {
+      var url = new URLSearchParams(window.location.search);
+      var t = url.get('admin');
+      if (t) {
+        localStorage.setItem('pictrikit_admin_token', t);
+        history.replaceState({}, '', location.pathname);
+      }
+      adminToken = localStorage.getItem('pictrikit_admin_token');
+      if (adminToken && adminToken.length > 0) {
+        isAdmin = true;
+        document.body.classList.add('admin-mode');
+        adminBadge.style.display = 'inline-flex';
+      }
+    }
+
+    // Render
+    function renderFeedback(list) {
+      feedbackData = list;
+      if (!list || list.length === 0) {
+        messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">chat_bubble_outline</span><p>No messages yet.</p></div>';
+        messagesCount.textContent = '';
+        return;
+      }
+      messagesCount.textContent = list.length + ' message' + (list.length > 1 ? 's' : '');
+      var html = '';
+      for (var i = 0; i < list.length; i++) {
+        var m = list[i];
+        var initials = (m.username || 'AN').slice(0,2).toUpperCase();
+        var replyHtml = m.reply ? '<aside class="reply-card"><header class="reply-header"><span class="creator-badge">Official</span><h4 class="reply-name">PictriKit Team</h4></header><p class="reply-content">' + esc(m.reply) + '</p></aside>' : '';
+        var adminHtml = isAdmin ? '<div class="admin-actions"><button class="admin-btn reply-btn" data-id="' + m.id + '"><span class="material-icons-round">reply</span>' + (m.reply ? 'Edit' : 'Reply') + '</button><button class="admin-btn delete-btn" data-id="' + m.id + '"><span class="material-icons-round">delete</span>Delete</button></div>' : '';
+        html += '<article class="message-card" data-id="' + m.id + '"><header class="message-header"><div class="message-user"><div class="user-avatar">' + initials + '</div><h3 class="user-name">' + esc(m.username) + '</h3></div><time class="message-time">' + timeAgo(m.created_at) + '</time></header><div class="message-body"><p class="message-content">' + esc(m.content) + '</p></div>' + replyHtml + adminHtml + '</article>';
+      }
+      messagesList.innerHTML = html;
+      bindAdminEvents();
+    }
+
+    function bindAdminEvents() {
+      if (!isAdmin) return;
+      var rBtns = messagesList.querySelectorAll('.reply-btn');
+      var dBtns = messagesList.querySelectorAll('.delete-btn');
+      for (var i = 0; i < rBtns.length; i++) {
+        rBtns[i].onclick = function() { openReplyForm(this.dataset.id); };
+      }
+      for (var j = 0; j < dBtns.length; j++) {
+        dBtns[j].onclick = function() { doDelete(this.dataset.id); };
+      }
+    }
+
+    function openReplyForm(id) {
+      var card = document.querySelector('[data-id="' + id + '"]');
+      if (!card || card.querySelector('.admin-reply-form')) return;
+      var item = feedbackData.find(function(x) { return x.id === id; });
+      var form = document.createElement('div');
+      form.className = 'admin-reply-form';
+      form.innerHTML = '<textarea rows="3" maxlength="2000">' + esc(item && item.reply || '') + '</textarea><div class="admin-reply-form-actions"><button class="cancel-btn">Cancel</button><button class="save-btn">Save</button></div>';
+      form.querySelector('.cancel-btn').onclick = function() { form.remove(); };
+      form.querySelector('.save-btn').onclick = function() {
+        var txt = form.querySelector('textarea').value.trim();
+        fetch('/api/feedback', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+          body: JSON.stringify({ feedbackId: id, reply: txt || null })
+        }).then(function(r) {
+          if (r.ok) { showToast('Saved'); initFeedback(); }
+          else showToast('Failed', true);
+        });
+      };
+      card.appendChild(form);
+    }
+
+    function doDelete(id) {
+      if (!confirm('Delete?')) return;
+      fetch('/api/feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', 'X-Admin-Token': adminToken },
+        body: JSON.stringify({ feedbackId: id })
+      }).then(function(r) {
+        if (r.ok) { showToast('Deleted'); initFeedback(); }
+        else showToast('Failed', true);
       });
+    }
+
+    // Submit
+    input.oninput = function() { charCount.textContent = input.value.length; };
+    submitBtn.onclick = function() {
+      var c = input.value.trim();
+      if (c.length < 3) { showToast('Min 3 chars', true); return; }
+      submitBtn.disabled = true;
+      fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: c, username: getUserId() })
+      }).then(function(r) { return r.json(); }).then(function(d) {
+        submitBtn.disabled = false;
+        if (d.success) { showToast('Thanks!'); input.value = ''; charCount.textContent = '0'; initFeedback(); }
+        else showToast(d.error || 'Failed', true);
+      }).catch(function() { submitBtn.disabled = false; showToast('Error', true); });
+    };
+
+    // Init
+    async function initFeedback() {
+      var res = await fetch('/api/feedback?_t=' + Date.now());
+      var data = await res.json();
+      if (!data.success) {
+        messagesList.innerHTML = '<p class="empty-state">Failed to load</p>';
+        return;
+      }
+      renderFeedback(data.feedback);
+    }
+
+    // Start
+    initAdminMode();
+    initFeedback();
   });
   </script>
 </body>
