@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-F3GLBLC9JW"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-F3GLBLC9JW', { send_page_view: true });
+</script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>User Feedback & Official Responses - PictriKit</title>
@@ -195,11 +203,11 @@
       return id;
     }
 
-    // Admin Mode (独立，不依赖 fetch)
+    // Admin Mode (鐙珛锛屼笉渚濊禆 fetch)
     function initAdminMode() {
       console.log('[Admin] initAdminMode called');
       
-      // 1. 检查 URL 参数
+      // 1. 妫€鏌?URL 鍙傛暟
       var url = new URLSearchParams(window.location.search);
       var t = url.get('admin');
       console.log('[Admin] URL token:', t ? 'present' : 'none');
@@ -210,11 +218,11 @@
         console.log('[Admin] Token saved to localStorage');
       }
       
-      // 2. 从 localStorage 读取
+      // 2. 浠?localStorage 璇诲彇
       adminToken = localStorage.getItem('pictrikit_admin_token');
       console.log('[Admin] localStorage token:', adminToken ? ('found: ' + adminToken.substring(0,4) + '...') : 'none');
       
-      // 3. 启用 Admin Mode
+      // 3. 鍚敤 Admin Mode
       if (adminToken && adminToken.length > 0) {
         isAdmin = true;
         document.body.classList.add('admin-mode');
