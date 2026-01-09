@@ -197,17 +197,33 @@
 
     // Admin Mode (独立，不依赖 fetch)
     function initAdminMode() {
+      console.log('[Admin] initAdminMode called');
+      
+      // 1. 检查 URL 参数
       var url = new URLSearchParams(window.location.search);
       var t = url.get('admin');
+      console.log('[Admin] URL token:', t ? 'present' : 'none');
+      
       if (t) {
         localStorage.setItem('pictrikit_admin_token', t);
         history.replaceState({}, '', location.pathname);
+        console.log('[Admin] Token saved to localStorage');
       }
+      
+      // 2. 从 localStorage 读取
       adminToken = localStorage.getItem('pictrikit_admin_token');
+      console.log('[Admin] localStorage token:', adminToken ? ('found: ' + adminToken.substring(0,4) + '...') : 'none');
+      
+      // 3. 启用 Admin Mode
       if (adminToken && adminToken.length > 0) {
         isAdmin = true;
         document.body.classList.add('admin-mode');
-        adminBadge.style.display = 'inline-flex';
+        if (adminBadge) {
+          adminBadge.style.display = 'inline-flex';
+        }
+        console.log('[Admin] Admin mode ENABLED');
+      } else {
+        console.log('[Admin] Admin mode disabled (no token)');
       }
     }
 
