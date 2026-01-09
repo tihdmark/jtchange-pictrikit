@@ -1,0 +1,7 @@
+# Security Policy for PictriKit
+# https://www.pictrikit.com
+
+Contact: mailto:security@pictrikit.com
+Expires: 2027-01-01T00:00:00.000Z
+Preferred-Languages: en, zh
+Canonical: https://www.pictrikit.com/.well-known/security.txt

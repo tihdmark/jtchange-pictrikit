@@ -12,6 +12,18 @@ Disallow: /dist/
 Disallow: /src/
 Disallow: /styles/
 Disallow: /.kiro/
-Disallow: /code.html
 Disallow: /node_modules/
 Disallow: /api/
+Disallow: /dev-files/
+Disallow: /lib/
+Disallow: /*.sql$
+Disallow: /test-*.html
+
+# Allow important files
+Allow: /sitemap.xml
+Allow: /robots.txt
+Allow: /manifest.json
+Allow: /favicon.svg
+
+# Crawl-delay for polite crawling
+Crawl-delay: 1

@@ -1,0 +1,16 @@
+/* TEAM */
+Name: PictriKit Team
+Site: https://www.pictrikit.com
+Location: Global
+
+/* THANKS */
+Thanks to all our users for feedback and support!
+
+/* SITE */
+Last update: 2026/01/09
+Language: English
+Doctype: HTML5
+IDE: Kiro
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Supabase, Vercel, Google Analytics
+Software: Pure HTML/CSS/JS (No Framework)
