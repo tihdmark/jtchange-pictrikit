@@ -2005,14 +2005,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Debug log removed
   });
   
-  // 工具栏交�?- 支持悬停预览和点击锁�?
+  // 工具栏交互 - 支持悬停预览和点击锁定
   const toolbar = document.getElementById('toolbar');
   const panel = document.getElementById('panel');
   const panelTitle = document.getElementById('panel-title');
   const panelClose = document.getElementById('panel-close');
   const toolBtns = document.querySelectorAll('.tool-btn[data-tool]');
   let currentTool = null;
-  let lockedTool = null;  // 点击锁定的工�?
+  let lockedTool = null;  // 点击锁定的工具
   let isMouseInArea = false;
   
   const panelTitles = {
@@ -2050,7 +2050,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   function closePanel() {
-    if (lockedTool) return;  // 如果有锁定的工具，不关闭
+    if (lockedTool) {
+      // 如果有锁定的工具，恢复到锁定工具的面板
+      openPanel(lockedTool);
+      return;
+    }
     panel.style.width = '0';
     currentTool = null;
     toolBtns.forEach(btn => {
@@ -2067,8 +2071,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // 再次点击解锁
         lockedTool = null;
         btn.classList.remove('locked');
+        // 保持面板打开，但不再锁定
       } else {
-        // 锁定新工�?
+        // 锁定新工具
         lockedTool = tool;
         toolBtns.forEach(b => b.classList.remove('locked'));
         btn.classList.add('locked');
@@ -2076,22 +2081,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
     
-    // 悬停预览（仅在未锁定时）
+    // 悬停预览 - 永远可以预览
     btn.addEventListener('mouseenter', () => {
       isMouseInArea = true;
-      if (!lockedTool) {
-        openPanel(btn.dataset.tool);
-      }
+      openPanel(btn.dataset.tool);
     });
   });
   
-  // 监听工具栏和面板的鼠标进�?离开
+  // 监听工具栏和面板的鼠标进入/离开
   toolbar.addEventListener('mouseenter', () => {
     isMouseInArea = true;
   });
   
   toolbar.addEventListener('mouseleave', (e) => {
-    if (lockedTool) return;  // 锁定时不关闭
     const rect = panel.getBoundingClientRect();
     if (e.clientX >= rect.left && e.clientX <= rect.right && 
         e.clientY >= rect.top && e.clientY <= rect.bottom) {
@@ -2099,7 +2101,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     isMouseInArea = false;
     setTimeout(() => {
-      if (!isMouseInArea && !lockedTool) closePanel();
+      if (!isMouseInArea) closePanel();
     }, 100);
   });
   
@@ -2108,7 +2110,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   
   panel.addEventListener('mouseleave', (e) => {
-    if (lockedTool) return;  // 锁定时不关闭
     const rect = toolbar.getBoundingClientRect();
     if (e.clientX >= rect.left && e.clientX <= rect.right && 
         e.clientY >= rect.top && e.clientY <= rect.bottom) {
@@ -2116,7 +2117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     isMouseInArea = false;
     setTimeout(() => {
-      if (!isMouseInArea && !lockedTool) closePanel();
+      if (!isMouseInArea) closePanel();
     }, 100);
   });
   
