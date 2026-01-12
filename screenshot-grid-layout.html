@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Arrange screenshots in organized grid layouts.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Screenshot Grid Layout","url":"https://www.pictrikit.com/screenshot-grid-layout.html","description":"Arrange multiple screenshots in a grid layout. Create 2x2, 2x3, or custom grids for organized image displays.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Screenshot Grid Layout",
+          "url": "https://www.pictrikit.com/screenshot-grid-layout.html",
+          "description": "Arrange multiple screenshots in a grid layout. Create 2x2, 2x3, or custom grids for organized image displays.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["2x2, 2x3, 3x3 grid layouts", "Custom grid arrangements", "Automatic spacing", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Create Screenshot Grid Layouts",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Choose Grid", "text": "Select your grid size (2x2, 2x3, etc.)"},
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload screenshots to fill the grid"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download your grid layout image"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I create a screenshot grid?", "acceptedAnswer": {"@type": "Answer", "text": "Select a grid layout in PictriKit, upload your screenshots, and they will be automatically arranged in a clean grid format."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

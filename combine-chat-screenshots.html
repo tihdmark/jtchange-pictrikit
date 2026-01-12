@@ -27,8 +27,47 @@
     <meta name="twitter:description" content="Stack chat screenshots vertically into one clean image.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Combine Chat Screenshots","url":"https://www.pictrikit.com/combine-chat-screenshots.html","description":"Combine multiple chat screenshots into one long image. Stack WhatsApp, iMessage, or WeChat conversations vertically.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Combine Chat Screenshots",
+          "url": "https://www.pictrikit.com/combine-chat-screenshots.html",
+          "description": "Combine multiple chat screenshots into one long image. Stack WhatsApp, iMessage, or WeChat conversations vertically.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": [
+            "Merge multiple chat screenshots",
+            "Vertical stacking for conversations",
+            "Works with WhatsApp, iMessage, WeChat",
+            "No registration required",
+            "Privacy-first: images processed locally"
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Combine Chat Screenshots",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload your chat screenshots in order"},
+            {"@type": "HowToStep", "name": "Arrange", "text": "Screenshots are automatically stacked vertically"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download as one continuous image"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I combine multiple chat screenshots?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your chat screenshots to PictriKit in order, and they will be automatically stacked vertically into one long image."}},
+            {"@type": "Question", "name": "Does this work with WhatsApp screenshots?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, PictriKit works with screenshots from any chat app including WhatsApp, iMessage, Telegram, and WeChat."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

@@ -32,8 +32,86 @@
     <meta property="og:site_name" content="PictriKit">
     
     <!-- JSON-LD -->
+    <!-- JSON-LD: WebApplication + HowTo -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Compare Screenshots Side by Side","url":"https://www.pictrikit.com/compare-screenshots.html","description":"Compare screenshots side by side in a clean layout for UI comparison or before-and-after views.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Compare Screenshots Side by Side",
+          "url": "https://www.pictrikit.com/compare-screenshots.html",
+          "description": "Compare screenshots side by side in a clean layout for UI comparison or before-and-after views.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "browserRequirements": "Requires JavaScript",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "featureList": [
+            "Side-by-side screenshot comparison",
+            "Before/after image layouts",
+            "Grid comparison for multiple images",
+            "No registration required",
+            "Privacy-first: images processed locally"
+          ]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Compare Screenshots Side by Side",
+          "description": "Learn how to create professional screenshot comparisons using PictriKit",
+          "totalTime": "PT1M",
+          "step": [
+            {
+              "@type": "HowToStep",
+              "name": "Choose Layout",
+              "text": "Select a comparison layout (side-by-side, vertical, or grid)"
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Upload Screenshots",
+              "text": "Drag and drop or click to upload your screenshots"
+            },
+            {
+              "@type": "HowToStep",
+              "name": "Export",
+              "text": "Download your comparison image as PNG or JPG"
+            }
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "How do I compare two screenshots side by side?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Upload your screenshots to PictriKit, select the Compare layout, adjust spacing if needed, and export your comparison image. The entire process takes less than a minute."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Is this tool free to use?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Yes, PictriKit is completely free. No registration or payment required."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Are my screenshots uploaded to a server?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "No, all image processing happens locally in your browser. Your screenshots never leave your device."
+              }
+            }
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

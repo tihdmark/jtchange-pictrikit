@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Put two screenshots together side by side or stacked. No design skills needed.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Put Two Screenshots Together","url":"https://www.pictrikit.com/put-two-screenshots-together.html","description":"Put two screenshots together side by side or stacked. No design skills needed. Just upload two images and get one clean result.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Put Two Screenshots Together",
+          "url": "https://www.pictrikit.com/put-two-screenshots-together.html",
+          "description": "Put two screenshots together side by side or stacked. No design skills needed. Just upload two images and get one clean result.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Side by side layout", "Vertical stacking", "Automatic alignment", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Put Two Screenshots Together",
+          "totalTime": "PT30S",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload your two screenshots"},
+            {"@type": "HowToStep", "name": "Choose Layout", "text": "Select side-by-side or stacked"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download your combined image"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I put two screenshots together?", "acceptedAnswer": {"@type": "Answer", "text": "Upload both screenshots to PictriKit, choose side-by-side or vertical layout, and export as one image."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

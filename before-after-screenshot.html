@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Show changes clearly with side-by-side before and after layouts.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Before and After Screenshot Comparison","url":"https://www.pictrikit.com/before-after-screenshot.html","description":"Create before and after screenshot comparisons with a clean side-by-side layout. Show changes clearly without manual alignment.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Before and After Screenshot Comparison",
+          "url": "https://www.pictrikit.com/before-after-screenshot.html",
+          "description": "Create before and after screenshot comparisons with a clean side-by-side layout. Show changes clearly without manual alignment.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Before/after comparison layouts", "Automatic alignment", "Labels for before and after", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Create Before and After Comparisons",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload Before", "text": "Upload your 'before' screenshot"},
+            {"@type": "HowToStep", "name": "Upload After", "text": "Upload your 'after' screenshot"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download your comparison image"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I create a before and after comparison?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your before and after screenshots to PictriKit, and they will be automatically arranged in a clean comparison layout."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

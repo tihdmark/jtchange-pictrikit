@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Stack multiple screenshots vertically into one long image.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Stack Screenshots Vertically","url":"https://www.pictrikit.com/stack-screenshots-vertically.html","description":"Stack multiple screenshots vertically into one long image. Perfect for combining scrolling content, chat logs, or sequential screens.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Stack Screenshots Vertically",
+          "url": "https://www.pictrikit.com/stack-screenshots-vertically.html",
+          "description": "Stack multiple screenshots vertically into one long image. Perfect for combining scrolling content, chat logs, or sequential screens.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Vertical stacking", "Long screenshot creation", "Scrolling content capture", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Stack Screenshots Vertically",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload screenshots in the order you want them stacked"},
+            {"@type": "HowToStep", "name": "Arrange", "text": "Screenshots are automatically stacked top to bottom"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download as one long vertical image"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I stack screenshots vertically?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your screenshots to PictriKit in order, select vertical stack layout, and export as one continuous image."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
