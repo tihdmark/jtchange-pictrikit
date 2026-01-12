@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "pictrikit.com" }],
+      "destination": "https://www.pictrikit.com/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -36,5 +44,6 @@
   ],
   "rewrites": [
     { "source": "/.well-known/security.txt", "destination": "/.well-known/security.txt" }
-  ]
+  ],
+  "trailingSlash": false
 }
