@@ -5,6 +5,11 @@
       "has": [{ "type": "host", "value": "pictrikit.com" }],
       "destination": "https://www.pictrikit.com/:path*",
       "permanent": true
+    },
+    {
+      "source": "/index.html",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "headers": [
