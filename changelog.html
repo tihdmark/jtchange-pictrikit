@@ -26,14 +26,87 @@
     <meta name="twitter:description" content="Track the latest updates and new features in PictriKit.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
-    <!-- JSON-LD -->
+    <!-- JSON-LD: SoftwareApplication (releaseNotes) + WebPage + BreadcrumbList -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebPage",
-      "name": "PictriKit Changelog",
-      "url": "https://www.pictrikit.com/changelog.html",
-      "description": "Version history and updates for PictriKit"
+      "@graph": [
+        {
+          "@type": "WebPage",
+          "@id": "https://www.pictrikit.com/changelog.html",
+          "url": "https://www.pictrikit.com/changelog.html",
+          "name": "Changelog - PictriKit Updates and New Features",
+          "description": "See what's new in PictriKit. Track the latest updates, improvements, and new features added to our screenshot layout tool.",
+          "lastReviewed": "2026-01-13",
+          "isPartOf": {
+            "@type": "WebSite",
+            "name": "PictriKit",
+            "url": "https://www.pictrikit.com/"
+          },
+          "mainEntity": {
+            "@type": "SoftwareApplication",
+            "name": "PictriKit",
+            "applicationCategory": "DesignApplication",
+            "operatingSystem": "Web Browser",
+            "url": "https://www.pictrikit.com/app.html",
+            "softwareVersion": "2.2.0",
+            "releaseNotes": "https://www.pictrikit.com/changelog.html",
+            "datePublished": "2025-11-01",
+            "dateModified": "2026-01-13",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "author": {
+              "@type": "Organization",
+              "name": "PictriKit",
+              "url": "https://www.pictrikit.com/"
+            }
+          }
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://www.pictrikit.com/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Changelog",
+              "item": "https://www.pictrikit.com/changelog.html"
+            }
+          ]
+        },
+        {
+          "@type": "ItemList",
+          "name": "PictriKit Version History",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "v2.2.0 - Original Scale Mode for Linear Layout",
+              "description": "Added Original scale mode, alignment options, better support for mixing desktop and mobile screenshots"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "v2.1.0 - Linear Export Enhancement",
+              "description": "Improved linear layout export with max height/width alignment, high-quality image smoothing"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "v2.0.0 - Major Release: Complete Redesign",
+              "description": "5 layout modes, device frame mockups, background color picker, redesigned UI"
+            }
+          ]
+        }
+      ]
     }
     </script>
 

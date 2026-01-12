@@ -25,14 +25,76 @@
   <meta name="twitter:description" content="Community feedback and official responses from PictriKit.">
   <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
   
-  <!-- JSON-LD -->
+  <!-- JSON-LD: DiscussionForumPosting + WebPage + BreadcrumbList -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "PictriKit Feedback",
-    "url": "https://www.pictrikit.com/feedback.html",
-    "description": "Share your feedback and suggestions for PictriKit"
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": "https://www.pictrikit.com/feedback.html",
+        "url": "https://www.pictrikit.com/feedback.html",
+        "name": "User Feedback & Official Responses - PictriKit",
+        "description": "Read user feedback, feature requests, and official responses from the PictriKit team. Share your suggestions and see how we respond to community input.",
+        "isPartOf": {
+          "@type": "WebSite",
+          "name": "PictriKit",
+          "url": "https://www.pictrikit.com/"
+        },
+        "about": {
+          "@type": "WebApplication",
+          "name": "PictriKit",
+          "url": "https://www.pictrikit.com/app.html"
+        },
+        "mainEntity": {
+          "@type": "DiscussionForumPosting",
+          "headline": "PictriKit Community Feedback Forum",
+          "url": "https://www.pictrikit.com/feedback.html",
+          "datePublished": "2026-01-01",
+          "dateModified": "2026-01-13",
+          "author": {
+            "@type": "Organization",
+            "name": "PictriKit Team",
+            "url": "https://www.pictrikit.com/"
+          },
+          "text": "This page collects feedback, suggestions, and bug reports from PictriKit users. Each message may include an official response from our team.",
+          "interactionStatistic": {
+            "@type": "InteractionCounter",
+            "interactionType": "https://schema.org/CommentAction",
+            "userInteractionCount": "50"
+          }
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://www.pictrikit.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Feedback",
+            "item": "https://www.pictrikit.com/feedback.html"
+          }
+        ]
+      },
+      {
+        "@type": "Organization",
+        "name": "PictriKit",
+        "url": "https://www.pictrikit.com/",
+        "logo": "https://www.pictrikit.com/favicon.svg",
+        "sameAs": [],
+        "contactPoint": {
+          "@type": "ContactPoint",
+          "contactType": "customer support",
+          "url": "https://www.pictrikit.com/contact.html"
+        }
+      }
+    ]
   }
   </script>
   
