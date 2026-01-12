@@ -1220,31 +1220,41 @@ class ExportSystem {
     return false;
   }
 
-  // Linear布局Canvas导出：等�?等宽拼接（默认模式）
+  // Linear布局Canvas导出：等高/等宽拼接（默认模式）
   // 所有图片缩放到统一高度（横向）或统一宽度（纵向）
   async _exportLinearCanvasUniform(loadedImages, layoutData, bgColor) {
     // Debug log removed');
     const { gap, padding, direction } = layoutData;
     const isHorizontal = direction === 'row';
     
-    // 找出最大高�?宽度作为基准
+    // 找出最大高度/宽度作为基准
     let maxHeight = 0, maxWidth = 0;
     loadedImages.forEach(imgData => {
       maxHeight = Math.max(maxHeight, imgData.height);
       maxWidth = Math.max(maxWidth, imgData.width);
     });
 
-    // 计算每张图片的缩放后尺寸（以最大高�?宽度为基准）
+    // 计算缩放因子：导出尺寸相对于显示画布的比例
+    // 显示画布固定为 900x560，导出使用原始图片尺寸
+    const displayCanvasWidth = 900;
+    const displayCanvasHeight = 560;
+    const displayPadding = padding * 2;
+    
+    // 计算显示时的有效内容区域
+    const displayContentWidth = displayCanvasWidth - displayPadding;
+    const displayContentHeight = displayCanvasHeight - displayPadding;
+    
+    // 计算每张图片的缩放后尺寸（以最大高度/宽度为基准）
     const scaledImages = loadedImages.map(imgData => {
       let scale, scaledWidth, scaledHeight;
       
       if (isHorizontal) {
-        // 横向排列：所有图片高度对齐到最大高�?
+        // 横向排列：所有图片高度对齐到最大高度
         scale = maxHeight / imgData.height;
         scaledWidth = Math.round(imgData.width * scale);
         scaledHeight = maxHeight;
       } else {
-        // 纵向排列：所有图片宽度对齐到最大宽�?
+        // 纵向排列：所有图片宽度对齐到最大宽度
         scale = maxWidth / imgData.width;
         scaledWidth = maxWidth;
         scaledHeight = Math.round(imgData.height * scale);
@@ -1253,18 +1263,40 @@ class ExportSystem {
       return { ...imgData, scaledWidth, scaledHeight, scale };
     });
 
-    // 计算总尺�?
-    let totalWidth = 0, totalHeight = 0;
-    const gapTotal = gap * (scaledImages.length - 1);
+    // 计算导出图片的总内容尺寸（不含padding）
+    let contentWidth = 0, contentHeight = 0;
+    const imageCount = scaledImages.length;
     
     if (isHorizontal) {
-      scaledImages.forEach(img => totalWidth += img.scaledWidth);
-      totalWidth += gapTotal + padding * 2;
-      totalHeight = maxHeight + padding * 2;
+      scaledImages.forEach(img => contentWidth += img.scaledWidth);
+      contentHeight = maxHeight;
     } else {
-      scaledImages.forEach(img => totalHeight += img.scaledHeight);
-      totalHeight += gapTotal + padding * 2;
-      totalWidth = maxWidth + padding * 2;
+      scaledImages.forEach(img => contentHeight += img.scaledHeight);
+      contentWidth = maxWidth;
+    }
+    
+    // 计算缩放因子：导出内容尺寸 / 显示内容尺寸
+    let scaleFactor;
+    if (isHorizontal) {
+      scaleFactor = contentHeight / displayContentHeight;
+    } else {
+      scaleFactor = contentWidth / displayContentWidth;
+    }
+    
+    // 按比例缩放 gap 和 padding
+    const scaledGap = Math.round(gap * scaleFactor);
+    const scaledPadding = Math.round(padding * scaleFactor);
+    
+    // 计算总尺寸
+    let totalWidth = 0, totalHeight = 0;
+    const gapTotal = scaledGap * (imageCount - 1);
+    
+    if (isHorizontal) {
+      totalWidth = contentWidth + gapTotal + scaledPadding * 2;
+      totalHeight = maxHeight + scaledPadding * 2;
+    } else {
+      totalHeight = contentHeight + gapTotal + scaledPadding * 2;
+      totalWidth = maxWidth + scaledPadding * 2;
     }
 
     // 创建Canvas
@@ -1273,7 +1305,7 @@ class ExportSystem {
     canvas.height = totalHeight;
     const ctx = canvas.getContext('2d');
     
-    // 启用图片平滑（放大时减少锯齿�?
+    // 启用图片平滑（放大时减少锯齿）
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
 
@@ -1283,49 +1315,68 @@ class ExportSystem {
       ctx.fillRect(0, 0, totalWidth, totalHeight);
     }
 
-    // 绘制图片（缩放后尺寸�?
-    let x = padding, y = padding;
+    // 绘制图片（缩放后尺寸）
+    let x = scaledPadding, y = scaledPadding;
     for (const imgData of scaledImages) {
       ctx.drawImage(imgData.img, x, y, imgData.scaledWidth, imgData.scaledHeight);
       
       if (isHorizontal) {
-        x += imgData.scaledWidth + gap;
+        x += imgData.scaledWidth + scaledGap;
       } else {
-        y += imgData.scaledHeight + gap;
+        y += imgData.scaledHeight + scaledGap;
       }
     }
 
     return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   }
 
-  // Linear布局Canvas导出：原始比例拼接（新增模式�?
+  // Linear布局Canvas导出：原始比例拼接（新增模式）
   // 保持每张图片原始尺寸，不缩放，按对齐方式排列
   async _exportLinearCanvasOriginal(loadedImages, layoutData, bgColor) {
     // Debug log removed');
     const { gap, padding, direction, align = 'center' } = layoutData;
     const isHorizontal = direction === 'row';
     
-    // 计算总尺寸（使用原始图片尺寸�?
-    let totalWidth = 0, totalHeight = 0, maxWidth = 0, maxHeight = 0;
+    // 计算总尺寸（使用原始图片尺寸）
+    let contentWidth = 0, contentHeight = 0, maxWidth = 0, maxHeight = 0;
     
     loadedImages.forEach(imgData => {
       maxWidth = Math.max(maxWidth, imgData.width);
       maxHeight = Math.max(maxHeight, imgData.height);
       if (isHorizontal) {
-        totalWidth += imgData.width;
+        contentWidth += imgData.width;
       } else {
-        totalHeight += imgData.height;
+        contentHeight += imgData.height;
       }
     });
 
-    // 添加间距
-    const gapTotal = gap * (loadedImages.length - 1);
+    // 计算缩放因子
+    const displayCanvasWidth = 900;
+    const displayCanvasHeight = 560;
+    const displayPadding = padding * 2;
+    const displayContentWidth = displayCanvasWidth - displayPadding;
+    const displayContentHeight = displayCanvasHeight - displayPadding;
+    
+    let scaleFactor;
     if (isHorizontal) {
-      totalWidth += gapTotal + padding * 2;
-      totalHeight = maxHeight + padding * 2;
+      scaleFactor = maxHeight / displayContentHeight;
     } else {
-      totalHeight += gapTotal + padding * 2;
-      totalWidth = maxWidth + padding * 2;
+      scaleFactor = maxWidth / displayContentWidth;
+    }
+    
+    // 按比例缩放 gap 和 padding
+    const scaledGap = Math.round(gap * scaleFactor);
+    const scaledPadding = Math.round(padding * scaleFactor);
+
+    // 添加间距计算总尺寸
+    const gapTotal = scaledGap * (loadedImages.length - 1);
+    let totalWidth, totalHeight;
+    if (isHorizontal) {
+      totalWidth = contentWidth + gapTotal + scaledPadding * 2;
+      totalHeight = maxHeight + scaledPadding * 2;
+    } else {
+      totalHeight = contentHeight + gapTotal + scaledPadding * 2;
+      totalWidth = maxWidth + scaledPadding * 2;
     }
 
     // 创建Canvas
@@ -1341,32 +1392,32 @@ class ExportSystem {
     }
 
     // 绘制图片（原始尺寸，按对齐方式排列）
-    let x = padding, y = padding;
+    let x = scaledPadding, y = scaledPadding;
     for (const imgData of loadedImages) {
       let drawX = x, drawY = y;
       
       if (isHorizontal) {
         // 横向排列：根据align决定垂直位置
         if (align === 'start') {
-          drawY = padding;
+          drawY = scaledPadding;
         } else if (align === 'end') {
-          drawY = padding + maxHeight - imgData.height;
+          drawY = scaledPadding + maxHeight - imgData.height;
         } else { // center
-          drawY = padding + (maxHeight - imgData.height) / 2;
+          drawY = scaledPadding + (maxHeight - imgData.height) / 2;
         }
         ctx.drawImage(imgData.img, drawX, drawY, imgData.width, imgData.height);
-        x += imgData.width + gap;
+        x += imgData.width + scaledGap;
       } else {
         // 纵向排列：根据align决定水平位置
         if (align === 'start') {
-          drawX = padding;
+          drawX = scaledPadding;
         } else if (align === 'end') {
-          drawX = padding + maxWidth - imgData.width;
+          drawX = scaledPadding + maxWidth - imgData.width;
         } else { // center
-          drawX = padding + (maxWidth - imgData.width) / 2;
+          drawX = scaledPadding + (maxWidth - imgData.width) / 2;
         }
         ctx.drawImage(imgData.img, drawX, drawY, imgData.width, imgData.height);
-        y += imgData.height + gap;
+        y += imgData.height + scaledGap;
       }
     }
 
