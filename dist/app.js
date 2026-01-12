@@ -1111,8 +1111,9 @@ class ExportSystem {
     const layout = state.layoutTree;
     const definition = layout.definition;
     const properties = state.properties || {};
-    const gap = properties.gap || 12;
-    const padding = properties.padding || 24;
+    // Use ?? instead of || to handle 0 values correctly
+    const gap = properties.gap !== undefined ? properties.gap : 12;
+    const padding = properties.padding !== undefined ? properties.padding : 24;
     
     // Collect all original image data
     const images = [];
@@ -2005,14 +2006,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Debug log removed
   });
   
-  // 工具栏交互 - 支持悬停预览和点击锁定
+  // 工具栏交互 - 悬停打开/离开关闭，点击只做视觉选中
   const toolbar = document.getElementById('toolbar');
   const panel = document.getElementById('panel');
   const panelTitle = document.getElementById('panel-title');
   const panelClose = document.getElementById('panel-close');
   const toolBtns = document.querySelectorAll('.tool-btn[data-tool]');
   let currentTool = null;
-  let lockedTool = null;  // 点击锁定的工具
+  let selectedTool = null;  // 用户选中的工具（仅视觉显示）
   let isMouseInArea = false;
   
   const panelTitles = {
@@ -2041,47 +2042,35 @@ document.addEventListener('DOMContentLoaded', () => {
     panel.style.width = '260px';
     currentTool = tool;
     
+    // 更新按钮状态：active表示当前悬停/打开的，selected表示用户选中的
     toolBtns.forEach(btn => {
       const isActive = btn.dataset.tool === tool;
-      const isLocked = btn.dataset.tool === lockedTool;
+      const isSelected = btn.dataset.tool === selectedTool;
       btn.classList.toggle('active', isActive);
-      btn.classList.toggle('locked', isLocked);
+      btn.classList.toggle('selected', isSelected);
     });
   }
   
   function closePanel() {
-    if (lockedTool) {
-      // 如果有锁定的工具，恢复到锁定工具的面板
-      openPanel(lockedTool);
-      return;
-    }
     panel.style.width = '0';
     currentTool = null;
     toolBtns.forEach(btn => {
       btn.classList.remove('active');
-      btn.classList.remove('locked');
+      // 保留 selected 状态
     });
   }
   
-  // 点击工具按钮 - 锁定/解锁
+  // 点击工具按钮 - 仅做视觉选中，不执行其他逻辑
   toolBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const tool = btn.dataset.tool;
-      if (lockedTool === tool) {
-        // 再次点击解锁
-        lockedTool = null;
-        btn.classList.remove('locked');
-        // 保持面板打开，但不再锁定
-      } else {
-        // 锁定新工具
-        lockedTool = tool;
-        toolBtns.forEach(b => b.classList.remove('locked'));
-        btn.classList.add('locked');
-        openPanel(tool);
-      }
+      // 更新选中状态（仅视觉）
+      selectedTool = tool;
+      toolBtns.forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
     });
     
-    // 悬停预览 - 永远可以预览
+    // 悬停打开面板
     btn.addEventListener('mouseenter', () => {
       isMouseInArea = true;
       openPanel(btn.dataset.tool);
@@ -2121,15 +2110,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   });
   
-  // 关闭按钮 - 同时解除锁定
+  // 关闭按钮
   panelClose?.addEventListener('click', () => {
-    lockedTool = null;
     panel.style.width = '0';
-    panel.classList.remove('panel-open'); // 移动端需要移除这个类
+    panel.classList.remove('panel-open');
     currentTool = null;
     toolBtns.forEach(btn => {
       btn.classList.remove('active');
-      btn.classList.remove('locked');
     });
   });
 });
