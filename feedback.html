@@ -97,7 +97,7 @@
     
     /* Creator Pinned Card */
     .creator-pinned { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #fde047; position: relative; }
-    .creator-pinned::before { content: '📌'; position: absolute; top: -8px; right: 16px; font-size: 1.25rem; }
+    .creator-pinned::before { content: '馃搶'; position: absolute; top: -8px; right: 16px; font-size: 1.25rem; }
     .creator-pinned-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
     .creator-pinned-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem; }
     .creator-pinned-meta { flex: 1; }
@@ -167,7 +167,7 @@
       <!-- Creator Pinned Message -->
       <article class="creator-pinned" aria-label="Message from the creator">
         <header class="creator-pinned-header">
-          <div class="creator-pinned-avatar">👋</div>
+          <div class="creator-pinned-avatar">馃憢</div>
           <div class="creator-pinned-meta">
             <h3 class="creator-pinned-name">From the Creator <span class="creator-pinned-badge">Pinned</span></h3>
             <p class="creator-pinned-label">Why I built PictriKit</p>
@@ -183,10 +183,10 @@
             <li>No learning curve</li>
           </ul>
           <p>If you open it, you already know how to use it.</p>
-          <p>I built this because most screenshot tools I tried were either too complex, required sign-ups, or produced messy results. PictriKit uses a layout-based approach — in my experience, the most reliable way to combine screenshots cleanly while preserving resolution.</p>
+          <p>I built this because most screenshot tools I tried were either too complex, required sign-ups, or produced messy results. PictriKit uses a layout-based approach 鈥?in my experience, the most reliable way to combine screenshots cleanly while preserving resolution.</p>
           <p>This is a new project, so bugs and edge cases may still exist. That's why this feedback page exists. If you encounter any issues, have ideas, or think something can be improved, please leave a message. I read and reply to feedback and fix problems as they come.</p>
           <p>If PictriKit is useful to you, sharing it with others would mean a lot. Your feedback and shares are what keep this project moving forward.</p>
-          <p>Thank you for being here <span class="creator-pinned-heart">❤️</span></p>
+          <p>Thank you for being here <span class="creator-pinned-heart">鉂わ笍</span></p>
         </div>
         <div class="share-section">
           <p class="share-label">Share PictriKit</p>
@@ -220,7 +220,17 @@
   </main>
 
   <footer>
-    <div class="container">
+    <div class="container">            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                <div style="font-size: 0.75rem; color: #6b7280; margin-bottom: 0.5rem;">Popular Tools:</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; font-size: 0.75rem;">
+                    <a href="/compare-screenshots.html" style="color: #6b7280; text-decoration: none;">Compare Screenshots</a>
+                    <a href="/combine-chat-screenshots.html" style="color: #6b7280; text-decoration: none;">Combine Chat</a>
+                    <a href="/before-after-screenshot.html" style="color: #6b7280; text-decoration: none;">Before &amp; After</a>
+                    <a href="/put-two-screenshots-together.html" style="color: #6b7280; text-decoration: none;">Put Two Together</a>
+                    <a href="/stack-screenshots-vertically.html" style="color: #6b7280; text-decoration: none;">Stack Vertically</a>
+                    <a href="/screenshot-grid-layout.html" style="color: #6b7280; text-decoration: none;">Grid Layout</a>
+                </div>
+            </div>
       <span style="font-size:0.875rem;color:#9ca3af;">&copy; 2026 PictriKit</span>
       <div style="display:flex;gap:1.5rem;">
         <a href="/privacy.html">Privacy</a>
@@ -281,11 +291,11 @@
       return id;
     }
 
-    // Admin Mode (鐙珛锛屼笉渚濊禆 fetch)
+    // Admin Mode (閻欘剛鐝涢敍灞肩瑝娓氭繆绂?fetch)
     function initAdminMode() {
       console.log('[Admin] initAdminMode called');
       
-      // 1. 妫€鏌?URL 鍙傛暟
+      // 1. 濡偓閺?URL 閸欏倹鏆?
       var url = new URLSearchParams(window.location.search);
       var t = url.get('admin');
       console.log('[Admin] URL token:', t ? 'present' : 'none');
@@ -296,11 +306,11 @@
         console.log('[Admin] Token saved to localStorage');
       }
       
-      // 2. 浠?localStorage 璇诲彇
+      // 2. 娴?localStorage 鐠囪褰?
       adminToken = localStorage.getItem('pictrikit_admin_token');
       console.log('[Admin] localStorage token:', adminToken ? ('found: ' + adminToken.substring(0,4) + '...') : 'none');
       
-      // 3. 鍚敤 Admin Mode
+      // 3. 閸氼垳鏁?Admin Mode
       if (adminToken && adminToken.length > 0) {
         isAdmin = true;
         document.body.classList.add('admin-mode');
