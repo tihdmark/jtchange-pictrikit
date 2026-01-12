@@ -24,6 +24,18 @@
   <meta name="twitter:title" content="User Feedback & Official Responses - PictriKit">
   <meta name="twitter:description" content="Community feedback and official responses from PictriKit.">
   <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
+  
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "PictriKit Feedback",
+    "url": "https://www.pictrikit.com/feedback.html",
+    "description": "Share your feedback and suggestions for PictriKit"
+  }
+  </script>
+  
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -97,7 +109,7 @@
     
     /* Creator Pinned Card */
     .creator-pinned { background: linear-gradient(135deg, #fefce8 0%, #fef9c3 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #fde047; position: relative; }
-    .creator-pinned::before { content: '馃搶'; position: absolute; top: -8px; right: 16px; font-size: 1.25rem; }
+    .creator-pinned::before { content: '棣冩惗'; position: absolute; top: -8px; right: 16px; font-size: 1.25rem; }
     .creator-pinned-header { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1rem; }
     .creator-pinned-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.125rem; }
     .creator-pinned-meta { flex: 1; }
@@ -167,7 +179,7 @@
       <!-- Creator Pinned Message -->
       <article class="creator-pinned" aria-label="Message from the creator">
         <header class="creator-pinned-header">
-          <div class="creator-pinned-avatar">馃憢</div>
+          <div class="creator-pinned-avatar">棣冩啟</div>
           <div class="creator-pinned-meta">
             <h3 class="creator-pinned-name">From the Creator <span class="creator-pinned-badge">Pinned</span></h3>
             <p class="creator-pinned-label">Why I built PictriKit</p>
@@ -183,10 +195,10 @@
             <li>No learning curve</li>
           </ul>
           <p>If you open it, you already know how to use it.</p>
-          <p>I built this because most screenshot tools I tried were either too complex, required sign-ups, or produced messy results. PictriKit uses a layout-based approach 鈥?in my experience, the most reliable way to combine screenshots cleanly while preserving resolution.</p>
+          <p>I built this because most screenshot tools I tried were either too complex, required sign-ups, or produced messy results. PictriKit uses a layout-based approach 閳?in my experience, the most reliable way to combine screenshots cleanly while preserving resolution.</p>
           <p>This is a new project, so bugs and edge cases may still exist. That's why this feedback page exists. If you encounter any issues, have ideas, or think something can be improved, please leave a message. I read and reply to feedback and fix problems as they come.</p>
           <p>If PictriKit is useful to you, sharing it with others would mean a lot. Your feedback and shares are what keep this project moving forward.</p>
-          <p>Thank you for being here <span class="creator-pinned-heart">鉂わ笍</span></p>
+          <p>Thank you for being here <span class="creator-pinned-heart">閴傘倧绗?/span></p>
         </div>
         <div class="share-section">
           <p class="share-label">Share PictriKit</p>
@@ -291,11 +303,11 @@
       return id;
     }
 
-    // Admin Mode (閻欘剛鐝涢敍灞肩瑝娓氭繆绂?fetch)
+    // Admin Mode (闁绘瑯鍓涢悵娑㈡晬鐏炶偐鐟濆〒姘箚缁?fetch)
     function initAdminMode() {
       console.log('[Admin] initAdminMode called');
       
-      // 1. 濡偓閺?URL 閸欏倹鏆?
+      // 1. 婵☆偀鍋撻柡?URL 闁告瑥鍊归弳?
       var url = new URLSearchParams(window.location.search);
       var t = url.get('admin');
       console.log('[Admin] URL token:', t ? 'present' : 'none');
@@ -306,11 +318,11 @@
         console.log('[Admin] Token saved to localStorage');
       }
       
-      // 2. 娴?localStorage 鐠囪褰?
+      // 2. 濞?localStorage 閻犲洩顕цぐ?
       adminToken = localStorage.getItem('pictrikit_admin_token');
       console.log('[Admin] localStorage token:', adminToken ? ('found: ' + adminToken.substring(0,4) + '...') : 'none');
       
-      // 3. 閸氼垳鏁?Admin Mode
+      // 3. 闁告凹鍨抽弫?Admin Mode
       if (adminToken && adminToken.length > 0) {
         isAdmin = true;
         document.body.classList.add('admin-mode');
