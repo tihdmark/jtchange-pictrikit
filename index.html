@@ -27,29 +27,63 @@
 <meta name="twitter:description" content="Create beautiful screenshot layouts in seconds. Free, no registration required.">
 <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
 <!-- Structured Data (JSON-LD) -->
+<!-- JSON-LD: Enhanced WebApplication + Organization + WebSite -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
-  "name": "PictriKit",
-  "url": "https://www.pictrikit.com",
-  "description": "Free online screenshot layout tool. Create beautiful image compositions with Linear, Focus, Grid, Compare, and Device Frame layouts.",
-  "applicationCategory": "DesignApplication",
-  "operatingSystem": "Any",
-  "offers": {
-    "@type": "Offer",
-    "price": "0",
-    "priceCurrency": "USD"
-  },
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.8",
-    "ratingCount": "150"
-  },
-  "author": {
-    "@type": "Organization",
-    "name": "PictriKit"
-  }
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "PictriKit",
+      "url": "https://www.pictrikit.com",
+      "description": "Free online screenshot layout tool. Create beautiful image compositions with Linear, Focus, Grid, Compare, and Device Frame layouts.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any",
+      "browserRequirements": "Requires JavaScript",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "150"
+      },
+      "featureList": [
+        "Compare screenshots side by side",
+        "Combine chat screenshots into one image",
+        "Create before/after comparisons",
+        "Grid layouts for multiple images",
+        "Stack screenshots vertically",
+        "Device frame mockups",
+        "No registration required",
+        "Privacy-first: all processing happens locally"
+      ],
+      "screenshot": "https://www.pictrikit.com/assets/images/og-image.svg",
+      "author": {
+        "@type": "Organization",
+        "name": "PictriKit"
+      }
+    },
+    {
+      "@type": "WebSite",
+      "name": "PictriKit",
+      "url": "https://www.pictrikit.com",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://www.pictrikit.com/?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "name": "PictriKit",
+      "url": "https://www.pictrikit.com",
+      "logo": "https://www.pictrikit.com/favicon.svg",
+      "sameAs": []
+    }
+  ]
 }
 </script>
 <!-- Favicon -->
