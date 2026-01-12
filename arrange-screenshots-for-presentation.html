@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Arrange screenshots into clean layouts for presentations and reports.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Arrange Screenshots for Presentation","url":"https://www.pictrikit.com/arrange-screenshots-for-presentation.html","description":"Arrange screenshots into clean layouts for presentations, reports, or documentation. Professional-looking results without design software.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Arrange Screenshots for Presentation",
+          "url": "https://www.pictrikit.com/arrange-screenshots-for-presentation.html",
+          "description": "Arrange screenshots into clean layouts for presentations, reports, or documentation. Professional-looking results without design software.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Presentation-ready layouts", "Professional formatting", "Multiple arrangement styles", "No design skills needed"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Arrange Screenshots for Presentations",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload screenshots for your presentation"},
+            {"@type": "HowToStep", "name": "Arrange", "text": "Choose a professional layout style"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download and add to your slides"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I arrange screenshots for a presentation?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your screenshots to PictriKit, select a presentation-friendly layout, and export the arranged image to use in your slides."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

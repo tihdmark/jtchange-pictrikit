@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Align screenshots centered automatically without manual positioning.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Align Screenshots Centered","url":"https://www.pictrikit.com/align-screenshots-centered.html","description":"Align screenshots centered automatically. No manual positioning needed. Every image stays perfectly centered in its space.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Align Screenshots Centered",
+          "url": "https://www.pictrikit.com/align-screenshots-centered.html",
+          "description": "Align screenshots centered automatically. No manual positioning needed. Every image stays perfectly centered in its space.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Automatic center alignment", "Perfect positioning", "Multiple image support", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Align Screenshots Centered",
+          "totalTime": "PT30S",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload your screenshots"},
+            {"@type": "HowToStep", "name": "Auto-Align", "text": "Images are automatically centered"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download your aligned layout"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I center align my screenshots?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your screenshots to PictriKit and they will be automatically centered in the layout. No manual adjustment needed."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">

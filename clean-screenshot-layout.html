@@ -27,8 +27,39 @@
     <meta name="twitter:description" content="Arrange screenshots into clean, organized layouts.">
     <meta name="twitter:image" content="https://www.pictrikit.com/assets/images/og-image.svg">
     
+    <!-- JSON-LD: WebApplication + HowTo + FAQ -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"WebApplication","name":"Clean Screenshot Layout","url":"https://www.pictrikit.com/clean-screenshot-layout.html","description":"Make clean screenshot layouts with consistent spacing and alignment. Arrange multiple screenshots into organized compositions.","applicationCategory":"DesignApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "WebApplication",
+          "name": "Clean Screenshot Layout",
+          "url": "https://www.pictrikit.com/clean-screenshot-layout.html",
+          "description": "Make clean screenshot layouts with consistent spacing and alignment. Arrange multiple screenshots into organized compositions.",
+          "applicationCategory": "DesignApplication",
+          "operatingSystem": "Any",
+          "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+          "featureList": ["Clean professional layouts", "Consistent spacing", "Multiple arrangement options", "No registration required"]
+        },
+        {
+          "@type": "HowTo",
+          "name": "How to Create Clean Screenshot Layouts",
+          "totalTime": "PT1M",
+          "step": [
+            {"@type": "HowToStep", "name": "Upload", "text": "Upload your screenshots"},
+            {"@type": "HowToStep", "name": "Choose Layout", "text": "Select a clean layout style"},
+            {"@type": "HowToStep", "name": "Export", "text": "Download your organized layout"}
+          ]
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {"@type": "Question", "name": "How do I create a clean screenshot layout?", "acceptedAnswer": {"@type": "Answer", "text": "Upload your screenshots to PictriKit, choose a layout, and the tool will automatically arrange them with consistent spacing and alignment."}}
+          ]
+        }
+      ]
+    }
     </script>
     
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
