@@ -44,10 +44,10 @@
       try {
         const res = await fetch('/api/debug');
         const data = await res.json();
-        log(`‚úÖ Status: ${res.status}`, 'success');
+        log(`‚ú?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ùå Error: ${e.message}`, 'error');
+        log(`‚ù?Error: ${e.message}`, 'error');
       }
     }
     
@@ -56,10 +56,10 @@
       try {
         const res = await fetch('/api/feedback');
         const data = await res.json();
-        log(`‚úÖ Status: ${res.status}`, 'success');
+        log(`‚ú?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ùå Error: ${e.message}`, 'error');
+        log(`‚ù?Error: ${e.message}`, 'error');
       }
     }
     
@@ -83,10 +83,10 @@
           body: JSON.stringify(testData)
         });
         const data = await res.json();
-        log(`‚úÖ Status: ${res.status}`, 'success');
+        log(`‚ú?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ùå Error: ${e.message}`, 'error');
+        log(`‚ù?Error: ${e.message}`, 'error');
         console.error('Full error:', e);
       }
     }
