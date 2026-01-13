@@ -1,13 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#007AFF"/>
-      <stop offset="100%" style="stop-color:#5856D6"/>
+    <linearGradient id="blue180" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <linearGradient id="purple180" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+    <linearGradient id="green180" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10B981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="orange180" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#D97706"/>
     </linearGradient>
   </defs>
-  <rect width="180" height="180" rx="36" fill="url(#grad)"/>
-  <rect x="30" y="30" width="52" height="52" rx="10" fill="white" opacity="0.9"/>
-  <rect x="98" y="30" width="52" height="52" rx="10" fill="white" opacity="0.7"/>
-  <rect x="30" y="98" width="52" height="52" rx="10" fill="white" opacity="0.7"/>
-  <rect x="98" y="98" width="52" height="52" rx="10" fill="white" opacity="0.5"/>
+  <!-- Background -->
+  <rect width="180" height="180" rx="36" fill="#f8fafc"/>
+  <!-- 4 colorful tiles -->
+  <rect x="20" y="20" width="65" height="65" rx="12" fill="url(#blue180)"/>
+  <rect x="95" y="20" width="65" height="65" rx="12" fill="url(#purple180)"/>
+  <rect x="20" y="95" width="65" height="65" rx="12" fill="url(#green180)"/>
+  <rect x="95" y="95" width="65" height="65" rx="12" fill="url(#orange180)"/>
+  <!-- Inner highlights -->
+  <rect x="28" y="28" width="24" height="12" rx="4" fill="white" opacity="0.3"/>
+  <rect x="103" y="28" width="24" height="12" rx="4" fill="white" opacity="0.3"/>
+  <rect x="28" y="103" width="24" height="12" rx="4" fill="white" opacity="0.3"/>
+  <rect x="103" y="103" width="24" height="12" rx="4" fill="white" opacity="0.3"/>
 </svg>
