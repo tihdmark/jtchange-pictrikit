@@ -12,6 +12,66 @@
       "source": "/index.html",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/tutorial.html",
+      "destination": "/tutorials.html",
+      "permanent": true
+    },
+    {
+      "source": "/tutorial",
+      "destination": "/tutorials.html",
+      "permanent": true
+    },
+    {
+      "source": "/features.html",
+      "destination": "/#features",
+      "permanent": true
+    },
+    {
+      "source": "/features",
+      "destination": "/#features",
+      "permanent": true
+    },
+    {
+      "source": "/en",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/en/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ja",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ja/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/zh",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/zh/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ko",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/ko/",
+      "destination": "/",
+      "permanent": true
     }
   ],
   "headers": [
