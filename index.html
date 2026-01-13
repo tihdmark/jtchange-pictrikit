@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<!-- Google Analytics -->
+<!-- Google Analytics - defer to not block rendering -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-F3GLBLC9JW"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -94,12 +94,22 @@
 <!-- Preconnect for faster font loading -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<!-- Preload LCP font for faster text rendering -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+<!-- Defer non-critical icon font -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" media="print" onload="this.media='all'"/>
+<noscript><link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/></noscript>
 <style>
+        /* Critical CSS - Font fallback to prevent FOIT */
+        @font-face {
+            font-family: 'Inter';
+            font-display: swap;
+            src: local('Inter');
+        }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f8fafc;
             color: #334155;
             line-height: 1.6;
@@ -524,7 +534,7 @@ Open Web Editor
           <span style="font-size: 0.8rem; font-weight: 600; color: #6b7280; text-transform: uppercase;">Before</span>
         </div>
         <div style="background: #f8fafc; border-radius: 12px; overflow: hidden;">
-          <img src="./assets/images/Snipaste_2026-01-12_19-40-58.png" alt="Before - Raw screenshots" style="width: 100%; height: auto; display: block;" />
+          <img src="./assets/images/Snipaste_2026-01-12_19-40-58.png" alt="Before - Raw screenshots" width="520" height="390" style="width: 100%; height: auto; display: block;" fetchpriority="high" />
         </div>
         <p style="font-size: 0.75rem; color: #9ca3af; text-align: center; margin-top: 0.75rem;">Scattered screenshots</p>
       </div>
@@ -544,7 +554,7 @@ Open Web Editor
           <span style="font-size: 0.8rem; font-weight: 600; color: #007AFF; text-transform: uppercase;">After</span>
         </div>
         <div style="background: #f0f9ff; border-radius: 12px; overflow: hidden;">
-          <img src="./assets/images/pictrikit-1768218106825.png" alt="After - Professional layout" style="width: 100%; height: auto; display: block;" />
+          <img src="./assets/images/pictrikit-1768218106825.png" alt="After - Professional layout" width="520" height="390" style="width: 100%; height: auto; display: block;" fetchpriority="high" />
         </div>
         <p style="font-size: 0.75rem; color: #007AFF; text-align: center; margin-top: 0.75rem;">Clean, professional layout</p>
       </div>
