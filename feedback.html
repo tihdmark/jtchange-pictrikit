@@ -483,13 +483,17 @@
 
     // Init
     async function initFeedback() {
-      var res = await fetch('/api/feedback?_t=' + Date.now());
-      var data = await res.json();
-      if (!data.success) {
-        messagesList.innerHTML = '<p class="empty-state">Failed to load</p>';
-        return;
+      try {
+        var res = await fetch('/api/feedback?_t=' + Date.now());
+        var data = await res.json();
+        if (!data.success) {
+          messagesList.innerHTML = '<p class="empty-state">Failed to load</p>';
+          return;
+        }
+        renderFeedback(data.feedback);
+      } catch (e) {
+        messagesList.innerHTML = '<p class="empty-state">Network error. Please refresh.</p>';
       }
-      renderFeedback(data.feedback);
     }
 
     // Start
