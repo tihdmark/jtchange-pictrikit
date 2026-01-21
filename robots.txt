@@ -8,9 +8,7 @@ Allow: /
 Sitemap: https://www.pictrikit.com/sitemap.xml
 
 # Disallow development/internal files
-Disallow: /dist/
 Disallow: /src/
-Disallow: /styles/
 Disallow: /.kiro/
 Disallow: /node_modules/
 Disallow: /api/

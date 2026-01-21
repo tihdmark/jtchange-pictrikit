@@ -12,7 +12,7 @@
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title>PictriKit - Screenshot Layout Tool</title>
-  <meta name="description" content="PictriKit - Free online screenshot layout tool. Create beautiful image compositions with multiple layouts including linear, focus, grid, compare and device frames.">
+  <meta name="description" content="Create screenshot mockups, grids, comparisons, and device frames. Free online tool, no signup, works in your browser.">
   <meta name="keywords" content="screenshot, layout, image editor, photo collage, pictrikit, screen capture, image composition">
   <link rel="canonical" href="https://www.pictrikit.com/app.html">
   
@@ -75,6 +75,19 @@
   <style>
     * { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', sans-serif; }
     body { -webkit-font-smoothing: antialiased; background: var(--bg-canvas); }
+    
+    /* Screen reader only content */
+    .sr-only {
+      position: absolute !important;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
     
     /* CSS Variables for theming */
     :root {
@@ -547,7 +560,7 @@
       <div style="width:28px;height:28px;border-radius:6px;background:#007AFF;color:#fff;display:flex;align-items:center;justify-content:center;">
         <span class="material-symbols-outlined" style="font-size:16px;">crop_free</span>
       </div>
-      <span style="font-size:14px;font-weight:600;color:#1d1d1f;">PictriKit</span>
+      <h1 style="font-size:14px;font-weight:600;color:#1d1d1f;margin:0;line-height:1;">PictriKit<span class="sr-only"> Screenshot Layout Tool</span></h1>
     </a>
     <div class="desktop-only" style="height:16px;width:1px;background:#d1d1d6;margin:0 8px;"></div>
     <div class="desktop-only" style="display:flex;gap:2px;">

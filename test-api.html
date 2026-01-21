@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
   <title>API Test - PictriKit</title>
   <style>
     body { font-family: monospace; padding: 2rem; max-width: 800px; margin: 0 auto; }
@@ -44,10 +45,10 @@
       try {
         const res = await fetch('/api/debug');
         const data = await res.json();
-        log(`‚ú?Status: ${res.status}`, 'success');
+        log(`ÔøΩ?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ù?Error: ${e.message}`, 'error');
+        log(`ÔøΩ?Error: ${e.message}`, 'error');
       }
     }
     
@@ -56,10 +57,10 @@
       try {
         const res = await fetch('/api/feedback');
         const data = await res.json();
-        log(`‚ú?Status: ${res.status}`, 'success');
+        log(`ÔøΩ?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ù?Error: ${e.message}`, 'error');
+        log(`ÔøΩ?Error: ${e.message}`, 'error');
       }
     }
     
@@ -83,10 +84,10 @@
           body: JSON.stringify(testData)
         });
         const data = await res.json();
-        log(`‚ú?Status: ${res.status}`, 'success');
+        log(`ÔøΩ?Status: ${res.status}`, 'success');
         logJson(data);
       } catch (e) {
-        log(`‚ù?Error: ${e.message}`, 'error');
+        log(`ÔøΩ?Error: ${e.message}`, 'error');
         console.error('Full error:', e);
       }
     }
