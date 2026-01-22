@@ -9,7 +9,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - PictriKit 是一个以**静态 HTML + 原生 JS**为主的截图排版工具站点。
 - 线上部署偏向 Vercel：根目录的 `vercel.json` 负责 clean URLs、重定向与缓存/安全 headers。
 - 主要交互应用页面为 `app.html`，其 JS 入口为 `dist/app.js`（打包后的单文件）。
-- 可选后端：`api/feedback.mjs` 是 Vercel Serverless Function，用 Supabase 存取 feedback。
+- 可选后端：`api/feedback.mjs` 是 Vercel Serverless Function，用 Turso（libSQL）存取 feedback。
 
 ## 常用命令（Windows / PowerShell）
 
@@ -65,8 +65,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
   - `GET`：拉取未 deleted 的反馈列表（按 `created_at` 倒序）。
   - `POST`：新增反馈（content/username）。
   - `PUT` / `DELETE`：需要 `x-admin-token` 与 `FEEDBACK_ADMIN_TOKEN` 匹配。
-- 环境变量示例见 `.env.example`（Supabase URL/Anon key + 可选 Admin token）。
-- `lib/supabase.js` 提供 `createClient` 的轻量封装（注意生产函数里目前直接在 `api/feedback.mjs` 创建 client）。
+- 环境变量示例见 `.env.example`（Turso Database URL/Auth token + 可选 Admin token）。
 
 ### 开发源码与测试（dev-files/）
 > 这里是“可读、可测、可维护”的模块化源码；`dist/app.js` 是其演进/打包结果。

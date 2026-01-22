@@ -1,22 +1,52 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@libsql/client';
 
-// Check environment variables
-const SUPABASE_URL = process.env.SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+const TURSO_DATABASE_URL = process.env.TURSO_DATABASE_URL;
+const TURSO_AUTH_TOKEN = process.env.TURSO_AUTH_TOKEN;
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Missing Supabase environment variables');
+if (!TURSO_DATABASE_URL) {
+  console.error('Missing Turso database URL');
 }
 
-const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const client = TURSO_DATABASE_URL
+  ? createClient({ url: TURSO_DATABASE_URL, authToken: TURSO_AUTH_TOKEN })
   : null;
+
+let schemaReady = false;
+
+async function ensureSchema() {
+  if (!client || schemaReady) return;
+  await client.execute(`
+    CREATE TABLE IF NOT EXISTS feedback (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content TEXT NOT NULL,
+      username TEXT NOT NULL,
+      reply TEXT,
+      deleted INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ','now'))
+    )
+  `);
+  schemaReady = true;
+}
+
+function normalizeRow(row) {
+  const normalized = {};
+  for (const [key, value] of Object.entries(row)) {
+    normalized[key] = typeof value === 'bigint' ? Number(value) : value;
+  }
+  return normalized;
+}
+
+function parseId(value) {
+  if (value === null || value === undefined || value === '') return null;
+  const num = typeof value === 'number' ? value : Number(value);
+  return Number.isFinite(num) ? num : null;
+}
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   
-  // Check if Supabase is configured
-  if (!supabase) {
+  // Check if Turso is configured
+  if (!client) {
     return res.status(503).json({ 
       success: false, 
       error: 'Database not configured. Please check environment variables.' 
@@ -25,17 +55,17 @@ export default async function handler(req, res) {
   
   if (req.method === 'GET') {
     try {
-      const { data, error } = await supabase
-        .from('feedback')
-        .select('*')
-        .eq('deleted', false)
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('Supabase error:', error);
-        return res.status(500).json({ success: false, error: error.message });
-      }
-      return res.status(200).json({ success: true, feedback: data || [] });
+      await ensureSchema();
+      const result = await client.execute({
+        sql: `
+          SELECT id, content, username, reply, created_at
+          FROM feedback
+          WHERE deleted = 0
+          ORDER BY created_at DESC, id DESC
+        `
+      });
+      const feedback = (result.rows || []).map(normalizeRow);
+      return res.status(200).json({ success: true, feedback });
     } catch (e) {
       console.error('Fetch error:', e);
       return res.status(500).json({ success: false, error: 'Database connection failed' });
@@ -52,14 +82,14 @@ export default async function handler(req, res) {
     }
 
     try {
-      const { error } = await supabase
-        .from('feedback')
-        .insert({ content: content.trim(), username: username || 'Anonymous', deleted: false });
-
-      if (error) {
-        console.error('Insert error:', error);
-        return res.status(500).json({ success: false, error: error.message });
-      }
+      await ensureSchema();
+      await client.execute({
+        sql: `
+          INSERT INTO feedback (content, username, deleted)
+          VALUES (?, ?, 0)
+        `,
+        args: [content.trim(), (username || 'Anonymous').trim()]
+      });
       return res.status(200).json({ success: true });
     } catch (e) {
       console.error('Post error:', e);
@@ -73,18 +103,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: 'Unauthorized' });
     }
     const { feedbackId, reply } = req.body || {};
-    if (!feedbackId) {
+    const id = parseId(feedbackId);
+    if (!id) {
       return res.status(400).json({ success: false, error: 'ID required' });
     }
-    const { error } = await supabase
-      .from('feedback')
-      .update({ reply: reply || null })
-      .eq('id', feedbackId);
-
-    if (error) {
-      return res.status(500).json({ success: false, error: error.message });
+    try {
+      await ensureSchema();
+      await client.execute({
+        sql: `UPDATE feedback SET reply = ? WHERE id = ?`,
+        args: [reply ? reply.trim() : null, id]
+      });
+      return res.status(200).json({ success: true });
+    } catch (e) {
+      console.error('Update error:', e);
+      return res.status(500).json({ success: false, error: 'Failed to update feedback' });
     }
-    return res.status(200).json({ success: true });
   }
 
   if (req.method === 'DELETE') {
@@ -93,18 +126,21 @@ export default async function handler(req, res) {
       return res.status(401).json({ success: false, error: 'Unauthorized' });
     }
     const { feedbackId } = req.body || {};
-    if (!feedbackId) {
+    const id = parseId(feedbackId);
+    if (!id) {
       return res.status(400).json({ success: false, error: 'ID required' });
     }
-    const { error } = await supabase
-      .from('feedback')
-      .update({ deleted: true })
-      .eq('id', feedbackId);
-
-    if (error) {
-      return res.status(500).json({ success: false, error: error.message });
+    try {
+      await ensureSchema();
+      await client.execute({
+        sql: `UPDATE feedback SET deleted = 1 WHERE id = ?`,
+        args: [id]
+      });
+      return res.status(200).json({ success: true });
+    } catch (e) {
+      console.error('Delete error:', e);
+      return res.status(500).json({ success: false, error: 'Failed to delete feedback' });
     }
-    return res.status(200).json({ success: true });
   }
 
   return res.status(405).json({ success: false, error: 'Method not allowed' });
