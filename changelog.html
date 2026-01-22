@@ -168,7 +168,7 @@
         .changelog-item h3 { font-size: 1.25rem; font-weight: 600; color: #111827; margin-bottom: 1rem; }
         .changelog-item ul { list-style: none; }
         .changelog-item li { padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #4b5563; font-size: 0.9375rem; }
-        .changelog-item li::before { content: "�?; position: absolute; left: 0; color: #007AFF; font-weight: bold; }
+        .changelog-item li::before { content: "→"; position: absolute; left: 0; color: #007AFF; font-weight: bold; }
         .tag { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem; font-weight: 500; margin-right: 0.5rem; }
         .tag-new { background: #dbeafe; color: #1d4ed8; }
         .tag-improved { background: #d1fae5; color: #047857; }
@@ -233,6 +233,40 @@
 
     <div class="content">
         <div class="changelog-list">
+            <div class="changelog-item">
+                <div class="changelog-header">
+                    <span class="version-badge">v2.4.0</span>
+                    <span class="changelog-date">January 22, 2026</span>
+                </div>
+                <h3>Content Refinement & English Localization</h3>
+                <ul>
+                    <li><span class="tag tag-improved">Improved</span> Use case hints now display as clear bullet lists for better readability</li>
+                    <li><span class="tag tag-improved">Improved</span> Changed hint color scheme to black/white for better contrast</li>
+                    <li><span class="tag tag-new">New</span> Published first blog post: "Why I Built PictriKit"</li>
+                    <li><span class="tag tag-new">New</span> Added 15 layout-specific FAQ questions covering all use cases</li>
+                    <li><span class="tag tag-improved">Improved</span> All content now in English for consistency</li>
+                    <li><span class="tag tag-improved">Improved</span> FAQ answers refined for clarity and natural tone</li>
+                    <li><span class="tag tag-improved">Improved</span> Blog content polished for authentic voice</li>
+                </ul>
+            </div>
+
+            <div class="changelog-item">
+                <div class="changelog-header">
+                    <span class="version-badge">v2.3.0</span>
+                    <span class="changelog-date">January 21, 2026</span>
+                </div>
+                <h3>UX Improvements & Feedback System Migration</h3>
+                <ul>
+                    <li><span class="tag tag-fixed">Fixed</span> Grid layout labels now show proper multiplication symbol (2×2, 1×3, 2×3, 3×3)</li>
+                    <li><span class="tag tag-new">New</span> Added use case hints for all layout tools (Linear, Focus, Grid, Compare, Frames)</li>
+                    <li><span class="tag tag-new">New</span> Created Blog page with SEO optimization</li>
+                    <li><span class="tag tag-new">New</span> Added Blog and FAQ links to app header navigation</li>
+                    <li><span class="tag tag-improved">Improved</span> Migrated feedback system from Supabase to Turso for better performance</li>
+                    <li><span class="tag tag-improved">Improved</span> Enhanced feedback form with better error handling</li>
+                    <li><span class="tag tag-improved">Improved</span> Updated sitemap with new pages</li>
+                </ul>
+            </div>
+            
             <div class="changelog-item">
                 <div class="changelog-header">
                     <span class="version-badge">v2.2.0</span>
