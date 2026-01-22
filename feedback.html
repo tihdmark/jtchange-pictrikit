@@ -488,12 +488,18 @@
         var res = await fetch('/api/feedback?_t=' + Date.now());
         var data = await res.json();
         if (!data.success) {
-          messagesList.innerHTML = '<p class="empty-state">Failed to load</p>';
+          var errorMsg = data.error || 'Failed to load';
+          if (errorMsg.includes('not configured') || errorMsg.includes('connection failed')) {
+            messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">cloud_off</span><p>Community feedback is temporarily unavailable.</p><p style="font-size:0.875rem;color:#9ca3af;margin-top:0.5rem;">The feedback system is being set up. Please check back later.</p></div>';
+          } else {
+            messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">error_outline</span><p>' + esc(errorMsg) + '</p></div>';
+          }
           return;
         }
         renderFeedback(data.feedback);
       } catch (e) {
-        messagesList.innerHTML = '<p class="empty-state">Network error. Please refresh.</p>';
+        console.error('Feedback load error:', e);
+        messagesList.innerHTML = '<div class="empty-state"><span class="material-icons-round">wifi_off</span><p>Network error. Please refresh the page.</p></div>';
       }
     }
 

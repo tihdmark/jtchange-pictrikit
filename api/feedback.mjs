@@ -1,24 +1,45 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_ANON_KEY
-);
+// Check environment variables
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('Missing Supabase environment variables');
+}
+
+const supabase = SUPABASE_URL && SUPABASE_ANON_KEY 
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   
+  // Check if Supabase is configured
+  if (!supabase) {
+    return res.status(503).json({ 
+      success: false, 
+      error: 'Database not configured. Please check environment variables.' 
+    });
+  }
+  
   if (req.method === 'GET') {
-    const { data, error } = await supabase
-      .from('feedback')
-      .select('*')
-      .eq('deleted', false)
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('feedback')
+        .select('*')
+        .eq('deleted', false)
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      return res.status(500).json({ success: false, error: error.message });
+      if (error) {
+        console.error('Supabase error:', error);
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true, feedback: data || [] });
+    } catch (e) {
+      console.error('Fetch error:', e);
+      return res.status(500).json({ success: false, error: 'Database connection failed' });
     }
-    return res.status(200).json({ success: true, feedback: data || [] });
   }
 
   if (req.method === 'POST') {
@@ -30,14 +51,20 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'Content required' });
     }
 
-    const { error } = await supabase
-      .from('feedback')
-      .insert({ content: content.trim(), username: username || 'Anonymous', deleted: false });
+    try {
+      const { error } = await supabase
+        .from('feedback')
+        .insert({ content: content.trim(), username: username || 'Anonymous', deleted: false });
 
-    if (error) {
-      return res.status(500).json({ success: false, error: error.message });
+      if (error) {
+        console.error('Insert error:', error);
+        return res.status(500).json({ success: false, error: error.message });
+      }
+      return res.status(200).json({ success: true });
+    } catch (e) {
+      console.error('Post error:', e);
+      return res.status(500).json({ success: false, error: 'Failed to save feedback' });
     }
-    return res.status(200).json({ success: true });
   }
 
   if (req.method === 'PUT') {
